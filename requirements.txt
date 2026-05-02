@@ -1,0 +1,29 @@
+altgraph @ file:///System/Volumes/Data/SWE/Apps/DT/BuildRoots/BuildRoot7/ActiveBuildRoot/Library/Caches/com.apple.xbs/Sources/python3/python3-133.100.1.1/altgraph-0.17.2-py2.py3-none-any.whl
+beautifulsoup4==4.14.3
+certifi==2026.4.22
+cffi==2.0.0
+charset-normalizer==3.4.7
+curl_cffi==0.13.0
+frozendict==2.4.7
+future @ file:///System/Volumes/Data/SWE/Apps/DT/BuildRoots/BuildRoot7/ActiveBuildRoot/Library/Caches/com.apple.xbs/Sources/python3/python3-133.100.1.1/future-0.18.2-py3-none-any.whl
+idna==3.13
+macholib @ file:///System/Volumes/Data/SWE/Apps/DT/BuildRoots/BuildRoot7/ActiveBuildRoot/Library/Caches/com.apple.xbs/Sources/python3/python3-133.100.1.1/macholib-1.15.2-py2.py3-none-any.whl
+multitasking==0.0.13
+numpy==2.0.2
+pandas==2.3.3
+peewee==4.0.5
+platformdirs==4.4.0
+protobuf==6.33.6
+psycopg2-binary==2.9.12
+pycparser==2.23
+python-dateutil==2.9.0.post0
+python-dotenv==1.2.1
+pytz==2026.1.post1
+requests==2.32.5
+six @ file:///System/Volumes/Data/SWE/Apps/DT/BuildRoots/BuildRoot7/ActiveBuildRoot/Library/Caches/com.apple.xbs/Sources/python3/python3-133.100.1.1/six-1.15.0-py2.py3-none-any.whl
+soupsieve==2.8.3
+typing_extensions==4.15.0
+tzdata==2026.2
+urllib3==2.6.3
+websockets==15.0.1
+yfinance==1.2.0
