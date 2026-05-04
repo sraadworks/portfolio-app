@@ -96,7 +96,7 @@ export default function DistributionChart({ assets, cashSummary }: { assets: any
               </Pie>
               <Tooltip 
                 contentStyle={{ borderRadius: '20px', border: 'none', boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)', padding: '15px' }}
-                formatter={(value: number) => [`₺${value.toLocaleString()}`, 'Değer']}
+                formatter={(value: any) => [`₺${Number(value).toLocaleString()}`, 'Değer']}
               />
             </PieChart>
           </ResponsiveContainer>
