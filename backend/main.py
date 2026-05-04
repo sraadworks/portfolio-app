@@ -1,3 +1,10 @@
+import logging
+import sys
+
+# Setup logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy import func
 from sqlalchemy.orm import Session
@@ -7,8 +14,13 @@ from datetime import date
 import models, schemas, crud
 from database import engine, get_db
 
-# Create DB tables
-models.Base.metadata.create_all(bind=engine)
+try:
+    logger.info("Connecting to database and creating tables...")
+    models.Base.metadata.create_all(bind=engine)
+    logger.info("Database tables created successfully.")
+except Exception as e:
+    logger.error(f"Error during database initialization: {e}")
+    # Don't exit yet, let's see if FastAPI can at least start
 
 app = FastAPI(title="Portfolio Management MVP API")
 
