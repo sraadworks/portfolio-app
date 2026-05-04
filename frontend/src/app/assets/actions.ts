@@ -12,29 +12,40 @@ export async function createAsset(formData: FormData) {
   const manual_price_raw = formData.get('manual_price') as string;
   const manual_price = manual_price_raw ? parseFloat(manual_price_raw) : null;
 
-  const res = await fetch(`${API_URL}/assets/`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      symbol,
-      name,
-      asset_type,
-      currency,
-      sector,
-      manual_price,
-    }),
-  });
+  try {
+    const res = await fetch(`${API_URL}/assets/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        symbol,
+        name,
+        asset_type,
+        currency,
+        sector,
+        manual_price,
+      }),
+    });
 
-  if (!res.ok) {
-    const err = await res.json();
-    return { error: err.detail || 'Failed to create asset' };
+    if (!res.ok) {
+      const errText = await res.text();
+      console.error('Backend Error:', errText);
+      try {
+        const err = JSON.parse(errText);
+        return { error: err.detail || 'Varlık oluşturulamadı.' };
+      } catch {
+        return { error: `Sunucu hatası: ${res.status}` };
+      }
+    }
+
+    revalidatePath('/assets');
+    revalidatePath('/');
+    return { success: true };
+  } catch (e: any) {
+    console.error('Fetch Error:', e);
+    return { error: `Bağlantı hatası: ${e.message}` };
   }
-
-  revalidatePath('/assets');
-  revalidatePath('/');
-  return { success: true };
 }
 
 export async function createTransaction(formData: FormData) {
@@ -120,7 +131,6 @@ export async function updateAsset(assetId: number, formData: FormData) {
   revalidatePath('/');
   return { success: true };
 }
-
 export async function getAssetTransactions(assetId: number) {
   const res = await fetch(`${API_URL}/transactions/${assetId}`, { cache: 'no-store' });
   if (!res.ok) return [];

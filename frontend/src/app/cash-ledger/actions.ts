@@ -21,28 +21,39 @@ export async function createCashTransaction(formData: FormData) {
   // Also we need to send today's date, but backend defaults to today.
   const date = new Date().toISOString().split('T')[0];
 
-  const res = await fetch(`${API_URL}/cash-ledger/`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      currency,
-      transaction_type,
-      amount,
-      date,
-      description,
-    }),
-  });
+  try {
+    const res = await fetch(`${API_URL}/cash-ledger/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        currency,
+        transaction_type,
+        amount,
+        date,
+        description,
+      }),
+    });
 
-  if (!res.ok) {
-    const err = await res.json();
-    return { error: err.detail || 'İşlem kaydedilemedi.' };
+    if (!res.ok) {
+      const errText = await res.text();
+      console.error('Backend Error:', errText);
+      try {
+        const err = JSON.parse(errText);
+        return { error: err.detail || 'İşlem kaydedilemedi.' };
+      } catch {
+        return { error: `Sunucu hatası: ${res.status}` };
+      }
+    }
+
+    revalidatePath('/cash-ledger');
+    revalidatePath('/');
+    return { success: true };
+  } catch (e: any) {
+    console.error('Fetch Error:', e);
+    return { error: `Bağlantı hatası: ${e.message}` };
   }
-
-  revalidatePath('/cash-ledger');
-  revalidatePath('/');
-  return { success: true };
 }
 
 export async function updateCashTransaction(id: number, data: any) {
