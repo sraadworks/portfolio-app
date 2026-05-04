@@ -156,8 +156,14 @@ def delete_cash_transaction(db: Session, cash_id: int):
     return True
 
 def create_cash_transaction(db: Session, cash: schemas.CashLedgerCreate):
-    db_cash = models.CashLedger(**cash.model_dump())
-    db.add(db_cash)
-    db.commit()
-    db.refresh(db_cash)
-    return db_cash
+    try:
+        db_cash = models.CashLedger(**cash.model_dump())
+        db.add(db_cash)
+        db.commit()
+        db.refresh(db_cash)
+        return db_cash
+    except Exception as e:
+        import logging
+        logging.error(f"DATABASE ERROR in create_cash_transaction: {e}")
+        db.rollback()
+        raise e
