@@ -1,6 +1,6 @@
-import { API_URL } from "../apiConfig";
 'use client';
 
+import { API_URL } from "../apiConfig";
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 

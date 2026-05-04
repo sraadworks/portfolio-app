@@ -1,4 +1,4 @@
-import { API_URL } from "../../apiConfig";
+import { API_URL } from "../apiConfig";
 import CashTransactionForm from './CashTransactionForm';
 import CashFilters from './CashFilters';
 import CashActions from './CashActions';

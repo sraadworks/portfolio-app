@@ -1,4 +1,4 @@
-import { API_URL } from "../../apiConfig";
+import { API_URL } from "../apiConfig";
 import AddAssetForm from './AddAssetForm';
 import AddTransactionForm from './AddTransactionForm';
 import AssetDetailModal from './AssetDetailModal';

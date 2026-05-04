@@ -1,6 +1,6 @@
-import { API_URL } from "../apiConfig";
 'use server'
 
+import { API_URL } from "../apiConfig";
 import { revalidatePath } from 'next/cache';
 
 export async function addCpiEntry(formData: FormData) {

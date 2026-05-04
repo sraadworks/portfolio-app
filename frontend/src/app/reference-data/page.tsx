@@ -1,4 +1,4 @@
-import { API_URL } from "../../apiConfig";
+import { API_URL } from "../apiConfig";
 import AddCpiForm from './AddCpiForm';
 import CpiActions from './CpiActions';
 import AddBenchmarkForm from './AddBenchmarkForm';

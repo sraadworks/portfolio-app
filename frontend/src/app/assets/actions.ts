@@ -1,6 +1,6 @@
-import { API_URL } from "../apiConfig";
 'use server'
 
+import { API_URL } from "../apiConfig";
 import { revalidatePath } from 'next/cache';
 
 export async function createAsset(formData: FormData) {
@@ -52,7 +52,7 @@ export async function createTransaction(formData: FormData) {
   const date_input = formData.get('date') as string;
   const date = date_input ? date_input : new Date().toISOString().split('T')[0];
 
-  const res = await fetch(${API_URL}/transactions/', {
+  const res = await fetch(`${API_URL}/transactions/`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
