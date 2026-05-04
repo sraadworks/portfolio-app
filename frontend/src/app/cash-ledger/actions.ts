@@ -1,3 +1,4 @@
+import { API_URL } from "../apiConfig";
 'use server'
 
 import { revalidatePath } from 'next/cache';
@@ -20,7 +21,7 @@ export async function createCashTransaction(formData: FormData) {
   // Also we need to send today's date, but backend defaults to today.
   const date = new Date().toISOString().split('T')[0];
 
-  const res = await fetch('http://127.0.0.1:8000/cash-ledger/', {
+  const res = await fetch(`${API_URL}/cash-ledger/`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -45,7 +46,7 @@ export async function createCashTransaction(formData: FormData) {
 }
 
 export async function updateCashTransaction(id: number, data: any) {
-  const res = await fetch(`http://127.0.0.1:8000/cash-ledger/${id}`, {
+  const res = await fetch(`${API_URL}/cash-ledger/${id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
@@ -61,7 +62,7 @@ export async function updateCashTransaction(id: number, data: any) {
 }
 
 export async function deleteCashTransaction(id: number) {
-  const res = await fetch(`http://127.0.0.1:8000/cash-ledger/${id}`, {
+  const res = await fetch(`${API_URL}/cash-ledger/${id}`, {
     method: 'DELETE',
   });
 

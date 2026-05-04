@@ -1,3 +1,4 @@
+import { API_URL } from "../apiConfig";
 'use server'
 
 import { revalidatePath } from 'next/cache';
@@ -11,7 +12,7 @@ export async function createAsset(formData: FormData) {
   const manual_price_raw = formData.get('manual_price') as string;
   const manual_price = manual_price_raw ? parseFloat(manual_price_raw) : null;
 
-  const res = await fetch('http://127.0.0.1:8000/assets/', {
+  const res = await fetch(`${API_URL}/assets/`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -51,7 +52,7 @@ export async function createTransaction(formData: FormData) {
   const date_input = formData.get('date') as string;
   const date = date_input ? date_input : new Date().toISOString().split('T')[0];
 
-  const res = await fetch('http://127.0.0.1:8000/transactions/', {
+  const res = await fetch(${API_URL}/transactions/', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -81,7 +82,7 @@ export async function createTransaction(formData: FormData) {
 }
 
 export async function deleteAsset(assetId: number) {
-  const res = await fetch(`http://127.0.0.1:8000/assets/${assetId}`, {
+  const res = await fetch(`${API_URL}/assets/${assetId}`, {
     method: 'DELETE',
   });
 
@@ -104,7 +105,7 @@ export async function updateAsset(assetId: number, formData: FormData) {
   const manual_price_raw = formData.get('manual_price') as string;
   const manual_price = manual_price_raw ? parseFloat(manual_price_raw) : null;
 
-  const res = await fetch(`http://127.0.0.1:8000/assets/${assetId}`, {
+  const res = await fetch(`${API_URL}/assets/${assetId}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ symbol, name, asset_type, currency, sector, manual_price }),
@@ -121,13 +122,13 @@ export async function updateAsset(assetId: number, formData: FormData) {
 }
 
 export async function getAssetTransactions(assetId: number) {
-  const res = await fetch(`http://127.0.0.1:8000/transactions/${assetId}`, { cache: 'no-store' });
+  const res = await fetch(`${API_URL}/transactions/${assetId}`, { cache: 'no-store' });
   if (!res.ok) return [];
   return res.json();
 }
 
 export async function deleteTransaction(txId: number) {
-  const res = await fetch(`http://127.0.0.1:8000/transactions/${txId}`, {
+  const res = await fetch(`${API_URL}/transactions/${txId}`, {
     method: 'DELETE',
   });
 
@@ -158,7 +159,7 @@ export async function updateTransaction(txId: number, formData: FormData) {
   if (!isNaN(risk_margin)) payload.risk_margin = risk_margin;
   if (date) payload.date = date;
 
-  const res = await fetch(`http://127.0.0.1:8000/transactions/${txId}`, {
+  const res = await fetch(`${API_URL}/transactions/${txId}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),

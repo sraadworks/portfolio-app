@@ -1,15 +1,16 @@
+import { API_URL } from "../../apiConfig";
 import AddCpiForm from './AddCpiForm';
 import CpiActions from './CpiActions';
 import AddBenchmarkForm from './AddBenchmarkForm';
 
 async function getReferenceData() {
-  const res = await fetch('http://127.0.0.1:8000/reference-data/', { cache: 'no-store' });
+  const res = await fetch(`${API_URL}/reference-data/`, { cache: 'no-store' });
   if (!res.ok) return [];
   return res.json();
 }
 
 async function getBenchmarkData() {
-  const res = await fetch('http://127.0.0.1:8000/benchmark-data/', { cache: 'no-store' });
+  const res = await fetch(`${API_URL}/benchmark-data/`, { cache: 'no-store' });
   if (!res.ok) return [];
   return res.json();
 }

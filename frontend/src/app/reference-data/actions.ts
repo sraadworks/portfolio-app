@@ -1,3 +1,4 @@
+import { API_URL } from "../apiConfig";
 'use server'
 
 import { revalidatePath } from 'next/cache';
@@ -16,7 +17,7 @@ export async function addCpiEntry(formData: FormData) {
   const d = new Date(date_str);
   const formatted = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`;
 
-  const res = await fetch(`http://127.0.0.1:8000/reference-data/?date_str=${formatted}&cpi_value=${cpi_value}&currency=${currency}`, {
+  const res = await fetch(`${API_URL}/reference-data/?date_str=${formatted}&cpi_value=${cpi_value}&currency=${currency}`, {
     method: 'POST',
   });
 
@@ -38,7 +39,7 @@ export async function updateCpiEntry(id: number, formData: FormData) {
     return { error: 'Geçerli bir enflasyon oranı giriniz.' };
   }
 
-  const res = await fetch(`http://127.0.0.1:8000/reference-data/${id}`, {
+  const res = await fetch(`${API_URL}/reference-data/${id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ cpi_value }),
@@ -56,7 +57,7 @@ export async function updateCpiEntry(id: number, formData: FormData) {
 }
 
 export async function deleteCpiEntry(id: number) {
-  const res = await fetch(`http://127.0.0.1:8000/reference-data/${id}`, {
+  const res = await fetch(`${API_URL}/reference-data/${id}`, {
     method: 'DELETE',
   });
 

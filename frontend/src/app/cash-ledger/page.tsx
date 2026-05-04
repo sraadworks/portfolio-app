@@ -1,3 +1,4 @@
+import { API_URL } from "../../apiConfig";
 import CashTransactionForm from './CashTransactionForm';
 import CashFilters from './CashFilters';
 import CashActions from './CashActions';
@@ -14,13 +15,13 @@ async function getCashLedger(searchParams: any) {
   if (safeParams.skip) params.append('skip', safeParams.skip);
   params.append('limit', '20');
 
-  const res = await fetch(`http://127.0.0.1:8000/cash-ledger/?${params.toString()}`, { cache: 'no-store' });
+  const res = await fetch(`${API_URL}/cash-ledger/?${params.toString()}`, { cache: 'no-store' });
   if (!res.ok) return { items: [], total: 0 };
   return res.json();
 }
 
 async function getCashSummary() {
-  const res = await fetch('http://127.0.0.1:8000/cash-ledger/summary', { cache: 'no-store' });
+  const res = await fetch(`${API_URL}/cash-ledger/summary`, { cache: 'no-store' });
   if (!res.ok) return { TRY: 0, USD: 0 };
   return res.json();
 }

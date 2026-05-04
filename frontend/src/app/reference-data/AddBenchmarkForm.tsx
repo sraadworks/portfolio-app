@@ -1,3 +1,4 @@
+import { API_URL } from "../apiConfig";
 'use client';
 
 import { useState } from 'react';
@@ -19,7 +20,7 @@ export default function AddBenchmarkForm() {
       value: parseFloat(formData.get('value') as string),
     };
 
-    const res = await fetch('http://127.0.0.1:8000/benchmark-data/', {
+    const res = await fetch(`${API_URL}/benchmark-data/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
@@ -34,7 +35,7 @@ export default function AddBenchmarkForm() {
 
   async function handleSync(name: string) {
     setLoading(true);
-    const res = await fetch(`http://127.0.0.1:8000/benchmark-data/sync/${name}`);
+    const res = await fetch(`${API_URL}/benchmark-data/sync/${name}`);
     if (res.ok) {
       router.refresh();
     }

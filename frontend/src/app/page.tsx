@@ -1,20 +1,21 @@
 import PerformanceChart from './PerformanceChart';
 import DistributionChart from './DistributionChart';
+import { API_URL } from './apiConfig';
 
 async function getAssets() {
-  const res = await fetch('http://127.0.0.1:8000/assets/', { cache: 'no-store' });
+  const res = await fetch(`${API_URL}/assets/`, { cache: 'no-store' });
   if (!res.ok) return [];
   return res.json();
 }
 
 async function getCashSummary() {
-  const res = await fetch('http://127.0.0.1:8000/cash-ledger/summary', { cache: 'no-store' });
+  const res = await fetch(`${API_URL}/cash-ledger/summary`, { cache: 'no-store' });
   if (!res.ok) return { TRY: 0, USD: 0 };
   return res.json();
 }
 
 async function getPerformanceData() {
-  const res = await fetch('http://127.0.0.1:8000/portfolio/performance', { cache: 'no-store' });
+  const res = await fetch(`${API_URL}/portfolio/performance`, { cache: 'no-store' });
   if (!res.ok) return [];
   return res.json();
 }

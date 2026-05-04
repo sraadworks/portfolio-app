@@ -1,10 +1,11 @@
+import { API_URL } from "../../apiConfig";
 import AddAssetForm from './AddAssetForm';
 import AddTransactionForm from './AddTransactionForm';
 import AssetDetailModal from './AssetDetailModal';
 import AssetActions from './AssetActions';
 
 async function getAssets() {
-  const res = await fetch('http://127.0.0.1:8000/assets/', { cache: 'no-store' });
+  const res = await fetch(`${API_URL}/assets/`, { cache: 'no-store' });
   if (!res.ok) return [];
   return res.json();
 }

@@ -1,13 +1,14 @@
+import { API_URL } from "../../../apiConfig";
 import Link from 'next/link';
 
 async function getAsset(id: string) {
-  const res = await fetch(`http://127.0.0.1:8000/assets/`, { cache: 'no-store' });
+  const res = await fetch(`${API_URL}/assets/`, { cache: 'no-store' });
   const assets = await res.json();
   return assets.find((a: any) => a.id.toString() === id);
 }
 
 async function getTransactions(id: string) {
-  const res = await fetch(`http://127.0.0.1:8000/transactions/${id}`, { cache: 'no-store' });
+  const res = await fetch(`${API_URL}/transactions/${id}`, { cache: 'no-store' });
   if (!res.ok) return [];
   return res.json();
 }
