@@ -331,6 +331,7 @@ def get_transactions_for_asset(asset_id: int, db: Session = Depends(get_db)):
             "commission": tx.commission,
             "tax": tx.tax,
             "risk_margin": tx.risk_margin,
+            "usd_rate": tx.usd_rate
         })
     return result
 
@@ -346,6 +347,7 @@ def update_transaction(tx_id: int, data: dict, db: Session = Depends(get_db)):
     if "commission" in data: tx.commission = data["commission"]
     if "tax" in data: tx.tax = data["tax"]
     if "risk_margin" in data: tx.risk_margin = data["risk_margin"]
+    if "usd_rate" in data: tx.usd_rate = data["usd_rate"]
     
     old_date = tx.date
     if "date" in data:
