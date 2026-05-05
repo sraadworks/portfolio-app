@@ -1,3 +1,4 @@
+import { Card, Table, TableHead, TableRow, TableHeaderCell, TableBody, TableCell, Text, Title, Badge, BadgeDelta, Flex } from "@tremor/react";
 import { API_URL } from "../apiConfig";
 import AddAssetForm from './AddAssetForm';
 import AddTransactionForm from './AddTransactionForm';
@@ -17,173 +18,166 @@ export default async function AssetsPage() {
   const closedAssets = allAssets.filter((a: any) => a.active_quantity <= 0);
 
   return (
-    <div className="flex flex-col gap-10">
-      <div className="flex justify-between items-center">
+    <div className="space-y-8">
+      <Flex justifyContent="between" alignItems="center">
         <div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">Varlıklar</h1>
-          <p className="text-slate-500 mt-1">Portföyünüzdeki tüm aktif yatırımlar ve geçmiş işlemleriniz.</p>
+          <Title>Varlıklarım</Title>
+          <Text>Portföyünüzdeki tüm aktif yatırımlar ve performans analizi.</Text>
         </div>
         <div className="flex gap-2">
           <AddTransactionForm assets={allAssets} />
           <AddAssetForm />
         </div>
-      </div>
+      </Flex>
       
       {/* 1. AKTİF VARLIKLAR */}
-      <div>
-        <h2 className="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
-          Aktif Varlıklar (Mevcut Portföy)
-        </h2>
-        <div className="bg-white/70 backdrop-blur-md rounded-2xl border border-slate-200/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-slate-50/50 border-b border-slate-100 text-base uppercase tracking-wider text-slate-500">
-                  <th className="px-6 py-4 font-bold">Sembol</th>
-                  <th className="px-6 py-4 font-bold">Adı</th>
-                  <th className="px-6 py-4 font-bold">Tip</th>
-                  <th className="px-6 py-4 font-bold text-right">Adet</th>
-                  <th className="px-6 py-4 font-bold text-right">Ort. Maliyet</th>
-                  <th className="px-6 py-4 font-bold text-right">Güncel Fiyat</th>
-                  <th className="px-6 py-4 font-bold text-right">Aktif Brüt Kâr</th>
-                  <th className="px-6 py-4 font-bold text-right">Reel Net Kâr</th>
-                  <th className="px-6 py-4 font-bold text-center">Detay</th>
-                  <th className="px-6 py-4 font-bold text-center">İşlemler</th>
-                </tr>
-              </thead>
-              <tbody className="text-lg divide-y divide-slate-100">
-                {activeAssets.length === 0 ? (
-                  <tr>
-                    <td colSpan={10} className="px-6 py-12 text-center text-slate-400 font-medium">
-                      Henüz aktif bir varlığınız bulunmuyor.
-                    </td>
-                  </tr>
-                ) : (
-                  activeAssets.map((asset: any) => {
-                    const avgCost = asset.active_cost / asset.active_quantity;
-                    const isGrossProfit = asset.active_gross_profit >= 0;
-                    const isRealProfit = asset.active_real_net_profit >= 0;
-                    return (
-                    <tr key={asset.id} className="hover:bg-blue-50/50 transition-colors group">
-                      <td className="px-6 py-4 font-bold text-slate-900">{asset.symbol}</td>
-                      <td className="px-6 py-4 text-slate-600 font-medium">{asset.name}</td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="bg-slate-100 text-slate-700 px-2.5 py-1 rounded-md text-xs font-semibold">{asset.asset_type}</span>
-                      </td>
-                      <td className="px-6 py-4 text-right font-semibold text-slate-700">{asset.active_quantity}</td>
-                      <td className="px-6 py-4 text-right text-slate-500">{avgCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {asset.currency}</td>
-                      <td className="px-6 py-4 text-right font-semibold text-slate-900">
-                        <div className="flex flex-col items-end">
-                          <span>{asset.current_price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {asset.currency}</span>
-                          {asset.manual_price > 0 && <span className="text-[10px] text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200 mt-1">Manuel</span>}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right">
-                        <div className={`font-bold ${isGrossProfit ? 'text-emerald-600' : 'text-rose-600'}`}>
-                          {isGrossProfit ? '+' : ''}{asset.active_gross_profit.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                        </div>
-                        <div className={`text-xs font-medium mt-0.5 ${isGrossProfit ? 'text-emerald-500' : 'text-rose-500'}`}>
-                          {isGrossProfit ? '▲' : '▼'} {Math.abs(asset.active_profit_loss_percent).toFixed(2)}%
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right">
-                        <div className={`font-bold ${isRealProfit ? 'text-emerald-600' : 'text-rose-600'}`}>
-                          {isRealProfit ? '+' : ''}{asset.active_real_net_profit.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                        </div>
-                        <div className="text-xs text-slate-400 mt-0.5">Enflasyon düzeltilmiş</div>
-                      </td>
-                      <td className="px-6 py-4 text-center">
-                        <AssetDetailModal asset={asset} />
-                      </td>
-                      <td className="px-6 py-4 text-center">
-                        <AssetActions asset={asset} />
-                      </td>
-                    </tr>
-                    );
-                  })
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
+      <Card>
+        <Title>Aktif Varlıklar (Mevcut Portföy)</Title>
+        <Table className="mt-5">
+          <TableHead>
+            <TableRow>
+              <TableHeaderCell>Sembol</TableHeaderCell>
+              <TableHeaderCell>Tip</TableHeaderCell>
+              <TableHeaderCell className="text-right">Adet</TableHeaderCell>
+              <TableHeaderCell className="text-right">Ort. Maliyet</TableHeaderCell>
+              <TableHeaderCell className="text-right">Fiyat</TableHeaderCell>
+              <TableHeaderCell className="text-right">USD Değer</TableHeaderCell>
+              <TableHeaderCell className="text-right">USD Getiri</TableHeaderCell>
+              <TableHeaderCell className="text-right">Reel Net Kâr (TL)</TableHeaderCell>
+              <TableHeaderCell className="text-center">Detay</TableHeaderCell>
+              <TableHeaderCell className="text-center">İşlemler</TableHeaderCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {activeAssets.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={10} className="text-center">
+                  Henüz aktif bir varlığınız bulunmuyor.
+                </TableCell>
+              </TableRow>
+            ) : (
+              activeAssets.map((asset: any) => {
+                const avgCost = asset.active_quantity > 0 ? asset.active_cost / asset.active_quantity : 0;
+                const isUSDProfit = asset.active_usd_profit >= 0;
+                
+                return (
+                  <TableRow key={asset.id}>
+                    <TableCell>
+                      <Text className="font-bold">{asset.symbol}</Text>
+                      <Text className="text-xs text-slate-400">{asset.name}</Text>
+                    </TableCell>
+                    <TableCell>
+                      <Badge size="xs" color="indigo">{asset.asset_type}</Badge>
+                    </TableCell>
+                    <TableCell className="text-right font-medium">{asset.active_quantity}</TableCell>
+                    <TableCell className="text-right">
+                      <Text>{avgCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {asset.currency}</Text>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Text className="font-bold">{asset.current_price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {asset.currency}</Text>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Text className="font-bold">${asset.active_usd_value?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</Text>
+                      <Text className="text-[10px] text-slate-400">Maliyet: ${asset.active_usd_cost?.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</Text>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <BadgeDelta deltaType={isUSDProfit ? "moderateIncrease" : "moderateDecrease"} size="xs">
+                        %{asset.active_usd_percent?.toFixed(2)}
+                      </BadgeDelta>
+                      <Text className={`text-[10px] font-bold mt-1 ${isUSDProfit ? 'text-emerald-600' : 'text-rose-600'}`}>
+                        {isUSDProfit ? '+' : ''}${asset.active_usd_profit?.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                      </Text>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Text className={`font-bold ${asset.active_real_net_profit >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                        {asset.active_real_net_profit >= 0 ? '+' : ''}{asset.active_real_net_profit.toLocaleString(undefined, { maximumFractionDigits: 0 })} ₺
+                      </Text>
+                      <Text className="text-[10px] text-slate-400">Enflasyon Arındırılmış</Text>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <AssetDetailModal asset={asset} />
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <AssetActions asset={asset} />
+                    </TableCell>
+                  </TableRow>
+                );
+              })
+            )}
+          </TableBody>
+        </Table>
+      </Card>
 
       {/* 2. KAPANAN POZİSYONLAR */}
-      <div>
-        <h2 className="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full bg-slate-300"></div>
-          Kapanan Pozisyonlar (İşlem Geçmişi)
-        </h2>
-        <div className="bg-white/50 backdrop-blur-md rounded-2xl border border-slate-200/60 shadow-[0_4px_20px_rgb(0,0,0,0.02)] overflow-hidden grayscale-[30%] opacity-90">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-slate-50/50 border-b border-slate-100 text-base uppercase tracking-wider text-slate-500">
-                  <th className="px-6 py-4 font-bold">Sembol</th>
-                  <th className="px-6 py-4 font-bold">Adı</th>
-                  <th className="px-6 py-4 font-bold">Tip</th>
-                  <th className="px-6 py-4 font-bold text-right">Toplam Maliyet</th>
-                  <th className="px-6 py-4 font-bold text-right">Satış Geliri</th>
-                  <th className="px-6 py-4 font-bold text-right">Gerçekleşen Kâr</th>
-                  <th className="px-6 py-4 font-bold text-right">Reel Net Kâr</th>
-                  <th className="px-6 py-4 font-bold text-center">Detay</th>
-                  <th className="px-6 py-4 font-bold text-center">İşlemler</th>
-                </tr>
-              </thead>
-              <tbody className="text-lg divide-y divide-slate-100">
-                {closedAssets.length === 0 ? (
-                  <tr>
-                    <td colSpan={9} className="px-6 py-12 text-center text-slate-400 font-medium">
-                      Kapanmış bir pozisyonunuz bulunmuyor.
-                    </td>
-                  </tr>
-                ) : (
-                  closedAssets.map((asset: any) => {
-                    const isProfit = asset.total_gross_profit >= 0;
-                    const isRealProfit = asset.total_real_net_profit >= 0;
-                    const percent = asset.total_cost > 0 ? (asset.total_gross_profit / asset.total_cost) * 100 : 0;
-                    
-                    return (
-                    <tr key={asset.id} className="hover:bg-slate-50 transition-colors group">
-                      <td className="px-6 py-4 font-bold text-slate-700">{asset.symbol}</td>
-                      <td className="px-6 py-4 text-slate-500 font-medium">{asset.name}</td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="bg-slate-100 text-slate-600 px-2.5 py-1 rounded-md text-xs font-semibold">{asset.asset_type}</span>
-                      </td>
-                      <td className="px-6 py-4 text-right font-medium text-slate-500">{asset.total_cost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {asset.currency}</td>
-                      <td className="px-6 py-4 text-right font-medium text-slate-700">
-                        {(asset.total_cost + asset.total_gross_profit).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {asset.currency}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right">
-                        <div className={`font-bold ${isProfit ? 'text-emerald-600' : 'text-rose-600'}`}>
-                          {isProfit ? '+' : ''}{asset.total_gross_profit.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                        </div>
-                        <div className={`text-xs font-medium mt-0.5 ${isProfit ? 'text-emerald-500' : 'text-rose-500'}`}>
-                          {isProfit ? '▲' : '▼'} {Math.abs(percent).toFixed(2)}%
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right">
-                        <div className={`font-bold ${isRealProfit ? 'text-emerald-600' : 'text-rose-600'}`}>
-                          {isRealProfit ? '+' : ''}{asset.total_real_net_profit.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                        </div>
-                        <div className="text-xs text-slate-400 mt-0.5">Enflasyon düzeltilmiş</div>
-                      </td>
-                      <td className="px-6 py-4 text-center">
-                        <AssetDetailModal asset={asset} />
-                      </td>
-                      <td className="px-6 py-4 text-center">
-                        <AssetActions asset={asset} />
-                      </td>
-                    </tr>
-                    );
-                  })
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
+      <Card>
+        <Title>Kapanan Pozisyonlar (İşlem Geçmişi)</Title>
+        <Table className="mt-5">
+          <TableHead>
+            <TableRow>
+              <TableHeaderCell>Sembol</TableHeaderCell>
+              <TableHeaderCell>Tip</TableHeaderCell>
+              <TableHeaderCell className="text-right">Toplam Maliyet</TableHeaderCell>
+              <TableHeaderCell className="text-right">Satış Geliri</TableHeaderCell>
+              <TableHeaderCell className="text-right">Gerçekleşen Kâr</TableHeaderCell>
+              <TableHeaderCell className="text-right">Reel Net Kâr (TL)</TableHeaderCell>
+              <TableHeaderCell className="text-center">Detay</TableHeaderCell>
+              <TableHeaderCell className="text-center">İşlemler</TableHeaderCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {closedAssets.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={8} className="text-center">
+                  Kapanmış bir pozisyonunuz bulunmuyor.
+                </TableCell>
+              </TableRow>
+            ) : (
+              closedAssets.map((asset: any) => {
+                const isProfit = asset.total_gross_profit >= 0;
+                const isRealProfit = asset.total_real_net_profit >= 0;
+                const percent = asset.total_cost > 0 ? (asset.total_gross_profit / asset.total_cost) * 100 : 0;
+                
+                return (
+                  <TableRow key={asset.id}>
+                    <TableCell>
+                      <Text className="font-bold">{asset.symbol}</Text>
+                      <Text className="text-xs text-slate-400">{asset.name}</Text>
+                    </TableCell>
+                    <TableCell>
+                      <Badge size="xs" color="slate">{asset.asset_type}</Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Text>{asset.total_cost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {asset.currency}</Text>
+                    </TableCell>
+                    <TableCell className="text-right font-medium">
+                      {(asset.total_cost + asset.total_gross_profit).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {asset.currency}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <BadgeDelta deltaType={isProfit ? "moderateIncrease" : "moderateDecrease"} size="xs">
+                        %{percent.toFixed(2)}
+                      </BadgeDelta>
+                      <Text className={`text-[10px] font-bold mt-1 ${isProfit ? 'text-emerald-600' : 'text-rose-600'}`}>
+                        {isProfit ? '+' : ''}{asset.total_gross_profit.toLocaleString(undefined, { maximumFractionDigits: 0 })} {asset.currency}
+                      </Text>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Text className={`font-bold ${isRealProfit ? 'text-emerald-600' : 'text-rose-600'}`}>
+                        {isRealProfit ? '+' : ''}{asset.total_real_net_profit.toLocaleString(undefined, { maximumFractionDigits: 0 })} ₺
+                      </Text>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <AssetDetailModal asset={asset} />
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <AssetActions asset={asset} />
+                    </TableCell>
+                  </TableRow>
+                );
+              })
+            )}
+          </TableBody>
+        </Table>
+      </Card>
     </div>
   );
 }
