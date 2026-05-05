@@ -22,6 +22,15 @@ def get_lots_for_asset(db: Session, asset_id: int):
 
 def create_transaction(db: Session, transaction: schemas.TransactionCreate):
     db_transaction = models.Transaction(**transaction.model_dump())
+    
+    # Automatically fetch USD rate if missing
+    if db_transaction.usd_rate is None:
+        try:
+            from services.data_fetcher import get_usd_try_rate
+            db_transaction.usd_rate = get_usd_try_rate()
+        except Exception:
+            pass
+            
     db.add(db_transaction)
     
     # Lot and CashLedger logic

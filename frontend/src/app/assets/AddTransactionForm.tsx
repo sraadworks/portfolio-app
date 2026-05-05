@@ -74,7 +74,7 @@ export default function AddTransactionForm({ assets }: { assets: any[] }) {
                 </div>
               </div>
               
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-[11px] font-medium text-slate-700 mb-1">Yönetim Ücreti %</label>
                   <input min="0" step="0.01" name="commission" type="number" placeholder="Örn: 1.5" className="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
@@ -83,9 +83,16 @@ export default function AddTransactionForm({ assets }: { assets: any[] }) {
                   <label className="block text-[11px] font-medium text-slate-700 mb-1">Stopaj Oranı %</label>
                   <input min="0" step="0.01" name="tax" type="number" placeholder="Örn: 17.5" className="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
                 </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-[11px] font-medium text-slate-700 mb-1">Arındırma Bağış %</label>
                   <input min="0" step="0.01" name="risk_margin" type="number" defaultValue="5.0" placeholder="Örn: 5" className="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-blue-700 mb-1">İşlem Günü USD Kuru</label>
+                  <input min="0" step="0.0001" name="usd_rate" type="number" placeholder="Otomatik çekiliyor..." className="w-full border border-blue-200 bg-blue-50 rounded-md px-3 py-2 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-blue-500" />
                 </div>
               </div>
 

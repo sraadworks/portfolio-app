@@ -34,6 +34,7 @@ class Transaction(Base):
     realized_cost = Column(Float, default=0.0)
     realized_inflation_diff = Column(Float, default=0.0)
     realized_profit = Column(Float, default=0.0)
+    usd_rate = Column(Float, nullable=True) # USD/TRY rate at the time of transaction
 
     asset = relationship("Asset", back_populates="transactions")
 

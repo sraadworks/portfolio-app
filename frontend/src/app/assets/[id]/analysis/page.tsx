@@ -258,13 +258,14 @@ export default async function AssetAnalysisPage({ params }: { params: Promise<{ 
                 <th className="px-6 py-4 font-bold">İşlem Tipi</th>
                 <th className="px-6 py-4 font-bold text-right">Adet / Tutar</th>
                 <th className="px-6 py-4 font-bold text-right">Fiyat</th>
+                <th className="px-6 py-4 font-bold text-right">USD Kuru</th>
                 <th className="px-6 py-4 font-bold text-right">Vergi/Komisyon</th>
               </tr>
             </thead>
             <tbody className="text-lg divide-y divide-slate-100">
               {transactions.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-8 text-center text-slate-400">İşlem kaydı yok.</td>
+                  <td colSpan={6} className="px-6 py-8 text-center text-slate-400">İşlem kaydı yok.</td>
                 </tr>
               ) : (
                 transactions.sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime()).map((tx: any) => (
@@ -277,6 +278,7 @@ export default async function AssetAnalysisPage({ params }: { params: Promise<{ 
                     </td>
                     <td className="px-6 py-4 text-right font-bold text-slate-800">{tx.amount.toLocaleString()} {tx.transaction_type === 'DIVIDEND' ? asset.currency : ''}</td>
                     <td className="px-6 py-4 text-right text-slate-600">{tx.price > 0 ? fmt(tx.price) + ' ' + asset.currency : '-'}</td>
+                    <td className="px-6 py-4 text-right font-medium text-blue-600">{tx.usd_rate ? fmt(tx.usd_rate) : '-'}</td>
                     <td className="px-6 py-4 text-right text-slate-500">
                       {tx.tax > 0 && <div>Vergi: {tx.tax}</div>}
                       {tx.commission > 0 && <div>Kom: {tx.commission}</div>}

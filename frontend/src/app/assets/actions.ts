@@ -77,7 +77,8 @@ export async function createTransaction(formData: FormData) {
       exchange_rate: 1.0,
       commission,
       tax,
-      risk_margin: parseFloat(formData.get('risk_margin') as string || '5')
+      risk_margin: parseFloat(formData.get('risk_margin') as string || '5'),
+      usd_rate: formData.get('usd_rate') ? parseFloat(formData.get('usd_rate') as string) : null
     }),
   });
 
@@ -168,6 +169,9 @@ export async function updateTransaction(txId: number, formData: FormData) {
   if (!isNaN(tax)) payload.tax = tax;
   if (!isNaN(risk_margin)) payload.risk_margin = risk_margin;
   if (date) payload.date = date;
+  
+  const usd_rate = formData.get('usd_rate') ? parseFloat(formData.get('usd_rate') as string) : null;
+  if (usd_rate !== null && !isNaN(usd_rate)) payload.usd_rate = usd_rate;
 
   const res = await fetch(`${API_URL}/transactions/${txId}`, {
     method: 'PUT',

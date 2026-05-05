@@ -65,6 +65,7 @@ class TransactionBase(BaseModel):
     commission: float = 0.0
     tax: float = 0.0
     risk_margin: float = 5.0
+    usd_rate: Optional[float] = None
 
 class TransactionCreate(TransactionBase):
     asset_id: int
