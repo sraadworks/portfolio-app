@@ -1,3 +1,4 @@
+import { Card, Table, TableHead, TableRow, TableHeaderCell, TableBody, TableCell, Text, Title, Badge, Flex, Grid, Callout } from "@tremor/react";
 import { API_URL } from "../apiConfig";
 import AddCpiForm from './AddCpiForm';
 import CpiActions from './CpiActions';
@@ -20,157 +21,144 @@ export default async function ReferenceDataPage() {
   const benchmarkData = await getBenchmarkData();
 
   return (
-    <div className="flex flex-col gap-8">
-      <div className="flex justify-between items-center mb-2">
+    <div className="space-y-8">
+      <Flex justifyContent="between" alignItems="center">
         <div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">TÜFE Endeksi</h1>
-          <p className="text-slate-500 mt-1">Enflasyon düzeltmesi hesaplamalarında kullanılan aylık enflasyon oranları.</p>
+          <Title>TÜFE & Piyasa Verileri</Title>
+          <Text>Enflasyon düzeltmesi ve performans karşılaştırması için referans veriler.</Text>
         </div>
         <AddCpiForm />
-      </div>
+      </Flex>
 
-      <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-800">
-        <strong>Nasıl Çalışır:</strong> İlgili para birimi (TRY veya USD) için açıklanan aylık enflasyon oranını (%) buradan giriniz. 
-        Sistem, varlığınızın para birimine göre uygun enflasyon verisini kullanarak &quot;TÜFE Düzeltmesi&quot; hesaplamasını otomatik olarak gerçekleştirir.
-      </div>
+      <Callout title="Nasıl Çalışır?" color="amber">
+        İlgili para birimi (TRY veya USD) için açıklanan aylık enflasyon oranını (%) buradan giriniz. 
+        Sistem, varlığınızın para birimine göre uygun enflasyon verisini kullanarak "TÜFE Düzeltmesi" hesaplamasını otomatik olarak gerçekleştirir.
+      </Callout>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <Grid numItemsMd={1} numItemsLg={2} className="gap-8">
         {/* TRY Table */}
-        <div className="flex flex-col gap-4">
-          <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-            <span className="w-8 h-8 rounded-lg bg-rose-100 text-rose-600 flex items-center justify-center text-xs font-black">TL</span>
-            TL (TRY) Tüfe Oranları
-          </h2>
-          <div className="bg-white/70 backdrop-blur-md rounded-2xl border border-slate-200/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="bg-slate-50/50 border-b border-slate-100 text-base uppercase tracking-wider text-slate-500">
-                    <th className="px-6 py-4 font-bold">Ay</th>
-                    <th className="px-6 py-4 font-bold text-right">Oran (%)</th>
-                    <th className="px-6 py-4 font-bold text-right">İşlemler</th>
-                  </tr>
-                </thead>
-                <tbody className="text-lg divide-y divide-slate-100">
-                  {data.filter((i: any) => i.currency === 'TRY').length === 0 ? (
-                    <tr>
-                      <td colSpan={3} className="px-6 py-8 text-center text-slate-400">Veri yok.</td>
-                    </tr>
-                  ) : (
-                    data.filter((i: any) => i.currency === 'TRY').map((item: any) => (
-                      <tr key={item.id} className="hover:bg-slate-50/50 transition-colors">
-                        <td className="px-6 py-4 font-medium text-slate-700">{item.date}</td>
-                        <td className="px-6 py-4 text-right font-bold text-slate-900">%{item.cpi_value.toFixed(2)}</td>
-                        <td className="px-6 py-4 text-right">
-                          <CpiActions item={item} />
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
+        <Card>
+          <Flex justifyContent="start" className="gap-2">
+            <Badge color="rose">TRY</Badge>
+            <Title>TL Tüfe Oranları</Title>
+          </Flex>
+          <Table className="mt-4">
+            <TableHead>
+              <TableRow>
+                <TableHeaderCell>Ay</TableHeaderCell>
+                <TableHeaderCell className="text-right">Oran (%)</TableHeaderCell>
+                <TableHeaderCell className="text-center">İşlemler</TableHeaderCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {data.filter((i: any) => i.currency === 'TRY').length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={3} className="text-center">Veri yok.</TableCell>
+                </TableRow>
+              ) : (
+                data.filter((i: any) => i.currency === 'TRY').map((item: any) => (
+                  <TableRow key={item.id}>
+                    <TableCell><Text>{item.date}</Text></TableCell>
+                    <TableCell className="text-right font-bold text-slate-900">%{item.cpi_value.toFixed(2)}</TableCell>
+                    <TableCell className="text-center">
+                      <CpiActions item={item} />
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </Card>
 
         {/* USD Table */}
-        <div className="flex flex-col gap-4">
-          <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-            <span className="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-black">US</span>
-            Dolar (USD) Tüfe Oranları
-          </h2>
-          <div className="bg-white/70 backdrop-blur-md rounded-2xl border border-slate-200/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="bg-slate-50/50 border-b border-slate-100 text-base uppercase tracking-wider text-slate-500">
-                    <th className="px-6 py-4 font-bold">Ay</th>
-                    <th className="px-6 py-4 font-bold text-right">Oran (%)</th>
-                    <th className="px-6 py-4 font-bold text-right">İşlemler</th>
-                  </tr>
-                </thead>
-                <tbody className="text-lg divide-y divide-slate-100">
-                  {data.filter((i: any) => i.currency === 'USD').length === 0 ? (
-                    <tr>
-                      <td colSpan={3} className="px-6 py-8 text-center text-slate-400">Veri yok.</td>
-                    </tr>
-                  ) : (
-                    data.filter((i: any) => i.currency === 'USD').map((item: any) => (
-                      <tr key={item.id} className="hover:bg-slate-50/50 transition-colors">
-                        <td className="px-6 py-4 font-medium text-slate-700">{item.date}</td>
-                        <td className="px-6 py-4 text-right font-bold text-slate-900">%{item.cpi_value.toFixed(2)}</td>
-                        <td className="px-6 py-4 text-right">
-                          <CpiActions item={item} />
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
+        <Card>
+          <Flex justifyContent="start" className="gap-2">
+            <Badge color="blue">USD</Badge>
+            <Title>Dolar Tüfe Oranları</Title>
+          </Flex>
+          <Table className="mt-4">
+            <TableHead>
+              <TableRow>
+                <TableHeaderCell>Ay</TableHeaderCell>
+                <TableHeaderCell className="text-right">Oran (%)</TableHeaderCell>
+                <TableHeaderCell className="text-center">İşlemler</TableHeaderCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {data.filter((i: any) => i.currency === 'USD').length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={3} className="text-center">Veri yok.</TableCell>
+                </TableRow>
+              ) : (
+                data.filter((i: any) => i.currency === 'USD').map((item: any) => (
+                  <TableRow key={item.id}>
+                    <TableCell><Text>{item.date}</Text></TableCell>
+                    <TableCell className="text-right font-bold text-slate-900">%{item.cpi_value.toFixed(2)}</TableCell>
+                    <TableCell className="text-center">
+                      <CpiActions item={item} />
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </Card>
+      </Grid>
 
       {/* Benchmark Data Section */}
-      <div className="flex flex-col gap-6 mt-4 border-t border-slate-100 pt-8">
-        <div className="flex justify-between items-center">
+      <Card>
+        <Flex justifyContent="between" alignItems="center">
           <div>
-            <h2 className="text-2xl font-black text-slate-800">Güncel Piyasa Göstergeleri</h2>
-            <p className="text-slate-500 text-sm">Grafik karşılaştırmalarında kullanılan en son veriler.</p>
+            <Title>Güncel Piyasa Göstergeleri</Title>
+            <Text>Grafik karşılaştırmalarında kullanılan en son veriler.</Text>
           </div>
           <AddBenchmarkForm />
-        </div>
+        </Flex>
 
-        <div className="bg-white/70 backdrop-blur-md rounded-2xl border border-slate-200/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-slate-50/50 border-b border-slate-100 text-base uppercase tracking-wider text-slate-500">
-                  <th className="px-6 py-4 font-bold">Son Güncelleme</th>
-                  <th className="px-6 py-4 font-bold">Endeks / Varlık</th>
-                  <th className="px-6 py-4 font-bold text-right">Güncel Değer</th>
-                </tr>
-              </thead>
-              <tbody className="text-lg divide-y divide-slate-100">
-                {(() => {
-                  // Her isim için sadece en güncel olanı filtrele
-                  const latestBenchmarks: any[] = [];
-                  const seenNames = new Set();
-                  
-                  // benchmarkData zaten tarihe göre azalan (desc) sıralı geliyor
-                  benchmarkData.forEach((item: any) => {
-                    if (!seenNames.has(item.name)) {
-                      latestBenchmarks.push(item);
-                      seenNames.add(item.name);
-                    }
-                  });
+        <Table className="mt-6">
+          <TableHead>
+            <TableRow>
+              <TableHeaderCell>Son Güncelleme</TableHeaderCell>
+              <TableHeaderCell>Endeks / Varlık</TableHeaderCell>
+              <TableHeaderCell className="text-right">Güncel Değer</TableHeaderCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {(() => {
+              const latestBenchmarks: any[] = [];
+              const seenNames = new Set();
+              benchmarkData.forEach((item: any) => {
+                if (!seenNames.has(item.name)) {
+                  latestBenchmarks.push(item);
+                  seenNames.add(item.name);
+                }
+              });
 
-                  if (latestBenchmarks.length === 0) {
-                    return (
-                      <tr>
-                        <td colSpan={3} className="px-6 py-12 text-center text-slate-400 font-medium">
-                          Henüz piyasa verisi eklenmemiş. SYNC butonlarını kullanarak veri çekebilirsiniz.
-                        </td>
-                      </tr>
-                    );
-                  }
+              if (latestBenchmarks.length === 0) {
+                return (
+                  <TableRow>
+                    <TableCell colSpan={3} className="text-center italic">
+                      Henüz piyasa verisi eklenmemiş.
+                    </TableCell>
+                  </TableRow>
+                );
+              }
 
-                  return latestBenchmarks.map((item: any) => (
-                    <tr key={item.id} className="hover:bg-slate-50/50 transition-colors">
-                      <td className="px-6 py-4 font-medium text-slate-600">{item.date}</td>
-                      <td className="px-6 py-4">
-                        <span className="bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded-md text-xs font-bold uppercase">{item.name}</span>
-                      </td>
-                      <td className="px-6 py-4 text-right font-black text-slate-900">{item.value.toLocaleString()}</td>
-                    </tr>
-                  ));
-                })()}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
+              return latestBenchmarks.map((item: any) => (
+                <TableRow key={item.id}>
+                  <TableCell><Text>{item.date}</Text></TableCell>
+                  <TableCell>
+                    <Badge color="indigo">{item.name}</Badge>
+                  </TableCell>
+                  <TableCell className="text-right font-bold text-slate-900">
+                    {item.value.toLocaleString()}
+                  </TableCell>
+                </TableRow>
+              ));
+            })()}
+          </TableBody>
+        </Table>
+      </Card>
     </div>
   );
 }
