@@ -1,11 +1,31 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { createTransaction } from './actions';
+import { API_URL } from '../apiConfig';
 
 export default function AddTransactionForm({ assets }: { assets: any[] }) {
   const [isOpen, setIsOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [usdRate, setUsdRate] = useState<string>('');
+
+  const fetchUsdRate = async () => {
+    try {
+      const res = await fetch(`${API_URL}/market-data/usd-rate`);
+      const data = await res.json();
+      if (data.rate) {
+        setUsdRate(data.rate.toString());
+      }
+    } catch (e) {
+      console.error('USD rate fetch failed', e);
+    }
+  };
+
+  useEffect(() => {
+    if (isOpen) {
+      fetchUsdRate();
+    }
+  }, [isOpen]);
 
   async function action(formData: FormData) {
     const result = await createTransaction(formData);
@@ -14,6 +34,7 @@ export default function AddTransactionForm({ assets }: { assets: any[] }) {
     } else {
       setIsOpen(false);
       setError(null);
+      setUsdRate('');
     }
   }
 
@@ -92,7 +113,16 @@ export default function AddTransactionForm({ assets }: { assets: any[] }) {
                 </div>
                 <div>
                   <label className="block text-[11px] font-bold text-blue-700 mb-1">İşlem Günü USD Kuru</label>
-                  <input min="0" step="0.0001" name="usd_rate" type="number" placeholder="Otomatik çekiliyor..." className="w-full border border-blue-200 bg-blue-50 rounded-md px-3 py-2 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  <input 
+                    min="0" 
+                    step="0.0001" 
+                    name="usd_rate" 
+                    type="number" 
+                    value={usdRate}
+                    onChange={(e) => setUsdRate(e.target.value)}
+                    placeholder="Otomatik çekiliyor..." 
+                    className="w-full border border-blue-200 bg-blue-50 rounded-md px-3 py-2 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                  />
                 </div>
               </div>
 

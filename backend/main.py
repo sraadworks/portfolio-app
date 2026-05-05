@@ -400,6 +400,12 @@ def get_cash_summary(db: Session = Depends(get_db)):
     usd_total = db.query(func.sum(models.CashLedger.amount)).filter(models.CashLedger.currency == "USD").scalar() or 0.0
     return {"TRY": try_total, "USD": usd_total}
 
+@app.get("/market-data/usd-rate")
+def get_current_usd_rate():
+    from services.data_fetcher import get_usd_try_rate
+    rate = get_usd_try_rate()
+    return {"rate": rate}
+
 @app.get("/cash-ledger/")
 def read_cash_ledger(
     currency: str = None, 
