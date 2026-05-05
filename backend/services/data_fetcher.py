@@ -63,11 +63,11 @@ def get_asset_price(symbol: str, asset_type: str):
         
     print(f"DEBUG: [Price Fetch] Starting for {fetch_symbol} (Type: {asset_type})")
 
+    price = 0.0
     try:
         ticker = yf.Ticker(fetch_symbol)
-        price = 0.0
         
-        # Method 1: Fast Info (Quickest)
+        # Method 1: Fast Info
         try:
             p = ticker.fast_info.get('lastPrice', None)
             if p and p > 0 and not (isinstance(p, float) and (p != p)):
@@ -76,7 +76,7 @@ def get_asset_price(symbol: str, asset_type: str):
         except Exception as e:
             print(f"DEBUG: [Price Fetch] Method 1 failed for {fetch_symbol}: {e}")
 
-        # Method 2: History (Most Reliable)
+        # Method 2: History
         if price <= 0:
             try:
                 hist = ticker.history(period="1d")
@@ -86,7 +86,7 @@ def get_asset_price(symbol: str, asset_type: str):
             except Exception as e:
                 print(f"DEBUG: [Price Fetch] Method 2 failed for {fetch_symbol}: {e}")
 
-        # Method 3: Info (Fallback)
+        # Method 3: Info
         if price <= 0:
             try:
                 p = ticker.info.get('currentPrice') or ticker.info.get('regularMarketPrice')
@@ -96,11 +96,36 @@ def get_asset_price(symbol: str, asset_type: str):
             except Exception as e:
                 print(f"DEBUG: [Price Fetch] Method 3 failed for {fetch_symbol}: {e}")
 
+        # Method 4: Direct JSON Fetch from Yahoo
+        if price <= 0:
+            try:
+                url = f"https://query1.finance.yahoo.com/v8/finance/chart/{fetch_symbol}?interval=1m&range=1d"
+                headers = {
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+                }
+                resp = requests.get(url, headers=headers, timeout=10)
+                if resp.status_code == 200:
+                    json_data = resp.json()
+                    res_list = json_data.get('chart', {}).get('result', [])
+                    if res_list:
+                        p = res_list[0].get('meta', {}).get('regularMarketPrice')
+                        if p:
+                            price = float(p)
+                            print(f"DEBUG: [Price Fetch] Method 4 (DirectJSON) success for {fetch_symbol}: {price}")
+            except Exception as e:
+                print(f"DEBUG: [Price Fetch] Method 4 failed for {fetch_symbol}: {e}")
+
         if price > 0:
             _cache[symbol] = price
             return price
         
-        print(f"WARNING: [Price Fetch] All methods FAILED for {fetch_symbol}")
+        # Final attempt: If Apple is marked as BIST, try it as US
+        if asset_type == 'BIST' and ".IS" in fetch_symbol and price <= 0:
+            base_symbol = symbol.split(".")[0].upper()
+            print(f"DEBUG: [Price Fetch] Retrying {base_symbol} as US asset fallback")
+            return get_asset_price(base_symbol, "US")
+
+        print(f"WARNING: [Price Fetch] ALL methods FAILED for {fetch_symbol}")
         return 0.0
     except Exception as e:
         print(f"CRITICAL: [Price Fetch] Fatal error for {fetch_symbol}: {e}")
