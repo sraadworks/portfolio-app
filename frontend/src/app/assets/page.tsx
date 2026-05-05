@@ -5,7 +5,23 @@ import AddTransactionForm from './AddTransactionForm';
 import AssetDetailModal from './AssetDetailModal';
 import AssetActions from './AssetActions';
 
-async function getAssets() {
+interface Asset {
+  id: number;
+  symbol: string;
+  name: string;
+  currency: string;
+  asset_type: string;
+  active_quantity: number;
+  active_cost: number;
+  active_value: number;
+  active_usd_value: number;
+  active_usd_cost: number;
+  active_usd_profit: number;
+  active_usd_percent: number;
+  active_real_net_profit: number;
+}
+
+async function getAssets(): Promise<Asset[]> {
   const res = await fetch(`${API_URL}/assets/`, { cache: 'no-store' });
   if (!res.ok) return [];
   return res.json();
@@ -14,8 +30,8 @@ async function getAssets() {
 export default async function AssetsPage() {
   const allAssets = await getAssets();
   
-  const activeAssets = allAssets.filter((a: any) => a.active_quantity > 0);
-  const closedAssets = allAssets.filter((a: any) => a.active_quantity <= 0);
+  const activeAssets = allAssets.filter((a: Asset) => a.active_quantity > 0);
+  const closedAssets = allAssets.filter((a: Asset) => a.active_quantity <= 0);
 
   return (
     <div className="space-y-8">
@@ -56,9 +72,10 @@ export default async function AssetsPage() {
                 </TableCell>
               </TableRow>
             ) : (
-              activeAssets.map((asset: any) => {
+              activeAssets.map((asset: Asset) => {
                 const avgCost = asset.active_quantity > 0 ? asset.active_cost / asset.active_quantity : 0;
                 const isUSDProfit = asset.active_usd_profit >= 0;
+                const currentPrice = asset.active_quantity > 0 ? asset.active_value / asset.active_quantity : 0;
                 
                 return (
                   <TableRow key={asset.id}>
@@ -74,7 +91,7 @@ export default async function AssetsPage() {
                       <Text>{avgCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {asset.currency}</Text>
                     </TableCell>
                     <TableCell className="text-right">
-                      <Text className="font-bold">{asset.current_price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {asset.currency}</Text>
+                      <Text className="font-bold">{currentPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {asset.currency}</Text>
                     </TableCell>
                     <TableCell className="text-right">
                       <Text className="font-bold">${asset.active_usd_value?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</Text>

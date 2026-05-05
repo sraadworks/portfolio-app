@@ -2,7 +2,22 @@ import { Grid, Card, Title, Text, Metric, Flex, ProgressBar } from "@tremor/reac
 import { TremorPerformanceChart, TremorDistributionChart, KpiCard } from './TremorCharts';
 import { API_URL } from './apiConfig';
 
-async function getAssets() {
+interface Asset {
+  id: number;
+  symbol: string;
+  name: string;
+  currency: string;
+  asset_type: string;
+  active_value: number;
+  active_cost: number;
+  active_gross_profit: number;
+  active_real_net_profit: number;
+  active_usd_profit: number;
+  active_usd_cost: number;
+  active_usd_value: number;
+}
+
+async function getAssets(): Promise<Asset[]> {
   const res = await fetch(`${API_URL}/assets/`, { cache: 'no-store' });
   if (!res.ok) return [];
   return res.json();
@@ -28,32 +43,32 @@ export default async function Home() {
   const totalCashTRY = cashSummary.TRY;
   const totalCashUSD = cashSummary.USD;
 
-  const tryAssets = assets.filter((a: any) => a.currency === 'TRY');
-  const usdAssets = assets.filter((a: any) => a.currency === 'USD');
+  const tryAssets = assets.filter((a: Asset) => a.currency === 'TRY');
+  const usdAssets = assets.filter((a: Asset) => a.currency === 'USD');
 
   // TRY Metrics
-  const totalTRYValue = tryAssets.reduce((acc: number, curr: any) => acc + (curr.active_value || 0), 0);
-  const totalTRYCost = tryAssets.reduce((acc: number, curr: any) => acc + (curr.active_cost || 0), 0);
-  const totalTRYGrossProfit = tryAssets.reduce((acc: number, curr: any) => acc + (curr.active_gross_profit || 0), 0);
-  const totalTRYRealProfit = tryAssets.reduce((acc: number, curr: any) => acc + (curr.active_real_net_profit || 0), 0);
+  const totalTRYValue = tryAssets.reduce((acc: number, curr: Asset) => acc + (curr.active_value || 0), 0);
+  const totalTRYCost = tryAssets.reduce((acc: number, curr: Asset) => acc + (curr.active_cost || 0), 0);
+  const totalTRYGrossProfit = tryAssets.reduce((acc: number, curr: Asset) => acc + (curr.active_gross_profit || 0), 0);
+  const totalTRYRealProfit = tryAssets.reduce((acc: number, curr: Asset) => acc + (curr.active_real_net_profit || 0), 0);
   const tryPercent = totalTRYCost > 0 ? (totalTRYGrossProfit / totalTRYCost) * 100 : 0;
   
-  const totalTRYUSDProfit = tryAssets.reduce((acc: number, curr: any) => acc + (curr.active_usd_profit || 0), 0);
-  const totalTRYUSDCost = tryAssets.reduce((acc: number, curr: any) => acc + (curr.active_usd_cost || 0), 0);
+  const totalTRYUSDProfit = tryAssets.reduce((acc: number, curr: Asset) => acc + (curr.active_usd_profit || 0), 0);
+  const totalTRYUSDCost = tryAssets.reduce((acc: number, curr: Asset) => acc + (curr.active_usd_cost || 0), 0);
   const tryUSDPercent = totalTRYUSDCost > 0 ? (totalTRYUSDProfit / totalTRYUSDCost) * 100 : 0;
 
   // USD Metrics
-  const totalUSDValue = usdAssets.reduce((acc: number, curr: any) => acc + (curr.active_value || 0), 0) + 
-                       tryAssets.reduce((acc: number, curr: any) => acc + (curr.active_usd_value || 0), 0);
+  const totalUSDValue = usdAssets.reduce((acc: number, curr: Asset) => acc + (curr.active_value || 0), 0) + 
+                       tryAssets.reduce((acc: number, curr: Asset) => acc + (curr.active_usd_value || 0), 0);
   
-  const totalUSDCost = usdAssets.reduce((acc: number, curr: any) => acc + (curr.active_cost || 0), 0) + 
-                       tryAssets.reduce((acc: number, curr: any) => acc + (curr.active_usd_cost || 0), 0);
+  const totalUSDCost = usdAssets.reduce((acc: number, curr: Asset) => acc + (curr.active_cost || 0), 0) + 
+                       tryAssets.reduce((acc: number, curr: Asset) => acc + (curr.active_usd_cost || 0), 0);
   
   const totalUSDProfit = totalUSDValue - totalUSDCost;
   const usdPercent = totalUSDCost > 0 ? (totalUSDProfit / totalUSDCost) * 100 : 0;
 
   // Prepare Distribution Data
-  const assetDistribution = assets.map((a: any) => ({
+  const assetDistribution = assets.map((a: Asset) => ({
     name: a.symbol,
     value: a.currency === 'TRY' ? a.active_value : a.active_value * 32.5, // Dummy rate for overview
   }));
@@ -101,7 +116,7 @@ export default async function Home() {
       />
 
       <Grid numItemsMd={1} numItemsLg={2} className="gap-6 mt-6">
-        <TremorDistributionChart data={assetDistribution.sort((a, b) => b.value - a.value)} title="Varlık Dağılımı (TL Bazlı)" />
+        <TremorDistributionChart data={assetDistribution.sort((a: any, b: any) => b.value - a.value)} title="Varlık Dağılımı (TL Bazlı)" />
         <Card>
           <Title>Portföy Sağlığı</Title>
           <div className="mt-4 space-y-4">

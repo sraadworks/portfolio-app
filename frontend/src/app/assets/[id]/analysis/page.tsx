@@ -1,14 +1,57 @@
-import { Card, Title, Text, Flex, Badge, BadgeDelta, Table, TableHead, TableRow, TableHeaderCell, TableBody, TableCell, Grid, Metric, List, ListItem, Divider } from "@tremor/react";
+import { Card, Title, Text, Flex, Badge, BadgeDelta, Table, TableHead, TableRow, TableHeaderCell, TableBody, TableCell, Grid, Metric, List, ListItem, Divider, Button } from "@tremor/react";
 import { API_URL } from "../../../apiConfig";
 import Link from 'next/link';
 
-async function getAsset(id: string) {
+interface Asset {
+  id: number;
+  symbol: string;
+  name: string;
+  currency: string;
+  asset_type: string;
+  active_quantity: number;
+  active_cost: number;
+  active_value: number;
+  active_holding_days: number;
+  active_gross_profit: number;
+  active_net_profit: number;
+  active_inflation_diff: number;
+  active_real_net_profit: number;
+  active_risk_margin_profit: number;
+  active_usd_profit: number;
+  active_usd_percent: number;
+  risk_margin_rate: number;
+  total_cost: number;
+  total_gross_profit: number;
+  total_real_net_profit: number;
+  realized_revenue: number;
+  realized_cost: number;
+  realized_holding_days: number;
+  realized_gross_profit: number;
+  realized_net_profit: number;
+  realized_inflation_diff: number;
+  realized_real_net_profit: number;
+  realized_risk_margin_profit: number;
+  current_price: number;
+}
+
+interface Transaction {
+  id: number;
+  date: string;
+  transaction_type: string;
+  amount: number;
+  price: number;
+  usd_rate: number;
+  tax: number;
+  commission: number;
+}
+
+async function getAsset(id: string): Promise<Asset | undefined> {
   const res = await fetch(`${API_URL}/assets/`, { cache: 'no-store' });
   const assets = await res.json();
   return assets.find((a: any) => a.id.toString() === id);
 }
 
-async function getTransactions(id: string) {
+async function getTransactions(id: string): Promise<Transaction[]> {
   const res = await fetch(`${API_URL}/transactions/${id}`, { cache: 'no-store' });
   if (!res.ok) return [];
   return res.json();
@@ -29,13 +72,13 @@ export default async function AssetAnalysisPage({ params }: { params: Promise<{ 
 
   // Calculate monthly percentage
   let monthlyPercent = 0;
-  const buyTxs = transactions.filter((t: any) => t.transaction_type === 'BUY');
+  const buyTxs = transactions.filter((t: Transaction) => t.transaction_type === 'BUY');
   if (buyTxs.length > 0) {
     const sortedBuys = [...buyTxs].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
     const firstBuyDate = new Date(sortedBuys[0].date);
     let endDate = new Date();
     if (asset.active_quantity === 0) {
-      const sellTxs = transactions.filter((t: any) => t.transaction_type === 'SELL');
+      const sellTxs = transactions.filter((t: Transaction) => t.transaction_type === 'SELL');
       if (sellTxs.length > 0) {
         const sortedSells = [...sellTxs].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
         endDate = new Date(sortedSells[0].date);
@@ -53,7 +96,7 @@ export default async function AssetAnalysisPage({ params }: { params: Promise<{ 
     <div className="space-y-6">
       <Flex justifyContent="start" className="gap-4">
         <Link href="/assets">
-          <Button variant="secondary" icon={() => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>}>
+          <Button variant="secondary" icon={() => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline' }}><path d="m15 18-6-6 6-6"/></svg>}>
             Geri
           </Button>
         </Link>
@@ -71,7 +114,7 @@ export default async function AssetAnalysisPage({ params }: { params: Promise<{ 
         <Card decoration="top" decorationColor="emerald">
           <Text>Toplam Brüt Kâr</Text>
           <Flex>
-            <Metric color={asset.total_gross_profit >= 0 ? "emerald" : "rose"}>
+            <Metric>
               {asset.total_gross_profit >= 0 ? "+" : ""}{fmt(asset.total_gross_profit)}
             </Metric>
             <BadgeDelta deltaType={asset.total_gross_profit >= 0 ? "moderateIncrease" : "moderateDecrease"}>
@@ -81,13 +124,13 @@ export default async function AssetAnalysisPage({ params }: { params: Promise<{ 
         </Card>
         <Card decoration="top" decorationColor="slate">
           <Text>Reel Net Kâr (Enflasyon Arındırılmış)</Text>
-          <Metric color={asset.total_real_net_profit >= 0 ? "emerald" : "rose"}>
+          <Metric>
             {asset.total_real_net_profit >= 0 ? "+" : ""}{fmt(asset.total_real_net_profit)}
           </Metric>
         </Card>
         <Card decoration="top" decorationColor="blue">
           <Text>Aylık Ortalama Getiri</Text>
-          <Metric color={monthlyPercent >= 0 ? "blue" : "amber"}>
+          <Metric>
             {monthlyPercent >= 0 ? "+" : ""}{monthlyPercent.toFixed(2)}%
           </Metric>
         </Card>
@@ -133,7 +176,7 @@ export default async function AssetAnalysisPage({ params }: { params: Promise<{ 
                   <Flex>
                     <div>
                       <Text className="font-bold text-blue-800">Dolar Bazlı Getiri</Text>
-                      <Metric color="blue" className="text-xl">
+                      <Metric className="text-xl text-blue-600">
                         {asset.active_usd_profit >= 0 ? "+" : ""}${fmt(asset.active_usd_profit)}
                       </Metric>
                     </div>
@@ -174,7 +217,7 @@ export default async function AssetAnalysisPage({ params }: { params: Promise<{ 
               <Divider />
               <ListItem>
                 <span className="font-bold">Gerçekleşen Reel Kâr</span>
-                <Metric color={asset.realized_real_net_profit >= 0 ? "emerald" : "rose"} className="text-lg">
+                <Metric className="text-lg">
                   {asset.realized_real_net_profit >= 0 ? "+" : ""}{fmt(asset.realized_real_net_profit)} {asset.currency}
                 </Metric>
               </ListItem>
@@ -199,7 +242,7 @@ export default async function AssetAnalysisPage({ params }: { params: Promise<{ 
             </TableRow>
           </TableHead>
           <TableBody>
-            {transactions.sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime()).map((tx: any) => (
+            {transactions.sort((a: Transaction, b: Transaction) => new Date(b.date).getTime() - new Date(a.date).getTime()).map((tx: Transaction) => (
               <TableRow key={tx.id}>
                 <TableCell>{tx.date}</TableCell>
                 <TableCell>
@@ -220,13 +263,4 @@ export default async function AssetAnalysisPage({ params }: { params: Promise<{ 
       </Card>
     </div>
   );
-}
-
-function Button({ children, variant, icon }: any) {
-  return (
-    <button className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all ${variant === 'secondary' ? 'bg-slate-100 hover:bg-slate-200 text-slate-700' : 'bg-blue-600 hover:bg-blue-700 text-white'}`}>
-      {icon && icon()}
-      {children}
-    </button>
-  )
 }

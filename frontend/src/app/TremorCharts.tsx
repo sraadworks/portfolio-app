@@ -1,8 +1,18 @@
 'use client';
 
-import { Card, AreaChart, Title, Text, DonutChart, Flex, Legend, BadgeDelta, Metric, Grid } from '@tremor/react';
+import { Card, AreaChart, Title, Text, DonutChart, Flex, Legend, BadgeDelta, Metric } from '@tremor/react';
 
-export function TremorPerformanceChart({ data, categories, colors }: { data: any[], categories: string[], colors: any[] }) {
+interface ChartData {
+  date: string;
+  [key: string]: string | number;
+}
+
+interface DistributionData {
+  name: string;
+  value: number;
+}
+
+export function TremorPerformanceChart({ data, categories, colors }: { data: ChartData[], categories: string[], colors: any[] }) {
   return (
     <Card className="mt-8">
       <Title>Portföy Performansı</Title>
@@ -21,7 +31,7 @@ export function TremorPerformanceChart({ data, categories, colors }: { data: any
   );
 }
 
-export function TremorDistributionChart({ data, title }: { data: any[], title: string }) {
+export function TremorDistributionChart({ data, title }: { data: DistributionData[], title: string }) {
   return (
     <Card>
       <Title>{title}</Title>
