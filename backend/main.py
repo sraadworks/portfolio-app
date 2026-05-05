@@ -250,6 +250,28 @@ def read_assets(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
             oldest_lot_date = min(lots, key=lambda x: x.buy_date).buy_date
             active_holding_days = (date.today() - oldest_lot_date).days
 
+        # 2.5 USD Performance Logic (New)
+        from services.data_fetcher import get_usd_try_rate
+        current_usd_rate = get_usd_try_rate()
+        active_usd_cost = 0.0
+        active_usd_value = 0.0
+        active_usd_profit = 0.0
+        active_usd_percent = 0.0
+
+        if asset.currency == 'TRY':
+            for lot in lots:
+                lot_usd_rate = lot.usd_rate if (lot.usd_rate and lot.usd_rate > 0) else current_usd_rate
+                active_usd_cost += (lot.remaining_amount * lot.buy_price) / lot_usd_rate
+            
+            active_usd_value = active_value / current_usd_rate
+            active_usd_profit = active_usd_value - active_usd_cost
+            active_usd_percent = (active_usd_profit / active_usd_cost * 100) if active_usd_cost > 0 else 0.0
+        else:
+            active_usd_cost = active_cost
+            active_usd_value = active_value
+            active_usd_profit = active_gross_profit
+            active_usd_percent = active_profit_loss_percent
+
         # 3. Total Metrics (Tüm Tarihsel Performans)
         total_dividend = sum(tx.amount for tx in txs if tx.transaction_type == 'DIVIDEND')
         total_commission = active_estimated_commission + realized_commission
@@ -282,6 +304,10 @@ def read_assets(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
             active_risk_margin_profit=active_risk_margin_profit,
             active_profit_loss_percent=active_profit_loss_percent,
             active_holding_days=active_holding_days,
+            active_usd_cost=active_usd_cost,
+            active_usd_value=active_usd_value,
+            active_usd_profit=active_usd_profit,
+            active_usd_percent=active_usd_percent,
             
             # Realized
             realized_cost=realized_cost,

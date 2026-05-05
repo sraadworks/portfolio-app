@@ -49,6 +49,7 @@ def create_transaction(db: Session, transaction: schemas.TransactionCreate):
             remaining_amount=transaction.amount,
             buy_price=transaction.price,
             exchange_rate=transaction.exchange_rate,
+            usd_rate=db_transaction.usd_rate,
         )
         db.add(db_lot)
         

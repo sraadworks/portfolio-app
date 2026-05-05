@@ -32,6 +32,12 @@ class AssetPerformance(Asset):
     active_risk_margin_profit: float
     active_profit_loss_percent: float
     active_holding_days: int
+    
+    # USD Metrics (for TRY assets)
+    active_usd_cost: float = 0.0
+    active_usd_value: float = 0.0
+    active_usd_profit: float = 0.0
+    active_usd_percent: float = 0.0
 
     # Realized Metrics (from sold portions)
     realized_cost: float

@@ -60,6 +60,7 @@ class Lot(Base):
     remaining_amount = Column(Float)
     buy_price = Column(Float)
     exchange_rate = Column(Float, default=1.0)
+    usd_rate = Column(Float, nullable=True) # USD/TRY rate at the time of purchase
     inflation_ref = Column(Float, nullable=True)
 
     asset = relationship("Asset", back_populates="lots")

@@ -41,10 +41,14 @@ export default async function Home() {
   const totalTRYRealProfit = tryAssets.reduce((acc: number, curr: any) => acc + (curr.active_real_net_profit || 0), 0);
   const tryPercent = totalTRYCost > 0 ? (totalTRYGrossProfit / totalTRYCost) * 100 : 0;
   
-  const totalUSDValue = usdAssets.reduce((acc: number, curr: any) => acc + (curr.active_value || 0), 0);
-  const totalUSDCost = usdAssets.reduce((acc: number, curr: any) => acc + (curr.active_cost || 0), 0);
-  const totalUSDGrossProfit = usdAssets.reduce((acc: number, curr: any) => acc + (curr.active_gross_profit || 0), 0);
-  const usdPercent = totalUSDCost > 0 ? (totalUSDGrossProfit / totalUSDCost) * 100 : 0;
+  const totalUSDValue = usdAssets.reduce((acc: number, curr: any) => acc + (curr.active_value || 0), 0) + 
+                       tryAssets.reduce((acc: number, curr: any) => acc + (curr.active_usd_value || 0), 0);
+  
+  const totalUSDCost = usdAssets.reduce((acc: number, curr: any) => acc + (curr.active_cost || 0), 0) + 
+                       tryAssets.reduce((acc: number, curr: any) => acc + (curr.active_usd_cost || 0), 0);
+  
+  const totalUSDProfit = totalUSDValue - totalUSDCost;
+  const usdPercent = totalUSDCost > 0 ? (totalUSDProfit / totalUSDCost) * 100 : 0;
 
   return (
     <div className="flex flex-col gap-8">
@@ -73,7 +77,7 @@ export default async function Home() {
             <div className="md:border-l md:border-white/10 md:pl-12">
               <div className="text-xs font-bold text-blue-200 uppercase tracking-widest mb-1">DÖVİZ YATIRIMLAR</div>
               <div className="flex items-baseline gap-3">
-                <div className="text-4xl font-black">${totalUSDGrossProfit.toLocaleString('en-US', { minimumFractionDigits: 2 })}</div>
+                <div className="text-4xl font-black">${totalUSDProfit.toLocaleString('en-US', { minimumFractionDigits: 2 })}</div>
                 <div className={`text-sm font-bold px-2 py-0.5 rounded ${usdPercent >= 0 ? 'bg-emerald-500/20 text-emerald-300' : 'bg-rose-500/20 text-rose-300'}`}>
                   {usdPercent >= 0 ? '▲' : '▼'} %{Math.abs(usdPercent).toFixed(2)}
                 </div>

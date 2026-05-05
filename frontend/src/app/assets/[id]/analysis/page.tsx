@@ -164,6 +164,19 @@ export default async function AssetAnalysisPage({ params }: { params: Promise<{ 
                     </span>
                   </div>
                 )}
+                {asset.currency === 'TRY' && (
+                  <div className="flex justify-between items-center py-2 bg-blue-50 -mx-2 px-2 rounded mt-2 border border-blue-100 shadow-sm">
+                    <span className="text-sm font-bold text-blue-800">Dolar Bazlı Getiri</span>
+                    <div className="text-right">
+                      <div className={`font-black ${asset.active_usd_profit >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                        {asset.active_usd_profit >= 0 ? '+' : ''}${fmt(asset.active_usd_profit)}
+                      </div>
+                      <div className={`text-xs font-bold ${asset.active_usd_percent >= 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
+                        {asset.active_usd_percent >= 0 ? '▲' : '▼'} %{Math.abs(asset.active_usd_percent).toFixed(2)}
+                      </div>
+                    </div>
+                  </div>
+                )}
               </>
             ) : (
               <div className="text-center text-slate-400 py-10">
