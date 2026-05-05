@@ -41,6 +41,10 @@ export default async function Home() {
   const totalTRYRealProfit = tryAssets.reduce((acc: number, curr: any) => acc + (curr.active_real_net_profit || 0), 0);
   const tryPercent = totalTRYCost > 0 ? (totalTRYGrossProfit / totalTRYCost) * 100 : 0;
   
+  const totalTRYUSDProfit = tryAssets.reduce((acc: number, curr: any) => acc + (curr.active_usd_profit || 0), 0);
+  const totalTRYUSDCost = tryAssets.reduce((acc: number, curr: any) => acc + (curr.active_usd_cost || 0), 0);
+  const tryUSDPercent = totalTRYUSDCost > 0 ? (totalTRYUSDProfit / totalTRYUSDCost) * 100 : 0;
+  
   const totalUSDValue = usdAssets.reduce((acc: number, curr: any) => acc + (curr.active_value || 0), 0) + 
                        tryAssets.reduce((acc: number, curr: any) => acc + (curr.active_usd_value || 0), 0);
   
@@ -71,6 +75,9 @@ export default async function Home() {
                 <div className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${totalTRYRealProfit >= 0 ? 'border-emerald-500/30 text-emerald-300 bg-emerald-500/10' : 'border-rose-500/30 text-rose-300 bg-rose-500/10'}`}>
                   REEL: {totalTRYRealProfit >= 0 ? '+' : ''}{totalTRYRealProfit.toLocaleString('tr-TR', { maximumFractionDigits: 0 })} ₺
                 </div>
+                <div className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${tryUSDPercent >= 0 ? 'border-blue-500/30 text-blue-200 bg-blue-500/10' : 'border-amber-500/30 text-amber-200 bg-amber-500/10'}`}>
+                  USD BAZLI: {tryUSDPercent >= 0 ? '+' : ''}{tryUSDPercent.toFixed(2)}%
+                </div>
               </div>
             </div>
 
@@ -82,7 +89,7 @@ export default async function Home() {
                   {usdPercent >= 0 ? '▲' : '▼'} %{Math.abs(usdPercent).toFixed(2)}
                 </div>
               </div>
-              <div className="text-sm text-blue-100/60 mt-2 font-medium">Toplam Portföy: ${totalUSDValue.toLocaleString('en-US', { minimumFractionDigits: 0 })}</div>
+              <div className="text-sm text-blue-100/60 mt-2 font-medium">Toplam Portföy (Dolar Değeri): ${totalUSDValue.toLocaleString('en-US', { minimumFractionDigits: 0 })}</div>
             </div>
           </div>
         </div>
