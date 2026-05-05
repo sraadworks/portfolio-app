@@ -39,8 +39,8 @@ def get_usd_try_rate():
 
 def get_asset_price(symbol: str, asset_type: str):
     """
-    Fetch the current price of an asset.
-    BIST stocks need .IS appended for yfinance.
+    Fetch the current price of an asset with multiple fallback methods.
+    Does NOT cache 0.0 values to allow retries.
     """
     global _cache, _cache_date
     today = date.today()
@@ -53,15 +53,55 @@ def get_asset_price(symbol: str, asset_type: str):
 
     fetch_symbol = symbol
     if asset_type == 'BIST':
-        fetch_symbol = f"{symbol}.IS"
+        # Ensure .IS is appended for BIST stocks
+        if not symbol.upper().endswith(".IS"):
+            fetch_symbol = f"{symbol.upper()}.IS"
+        else:
+            fetch_symbol = symbol.upper()
+    else:
+        fetch_symbol = symbol.upper()
         
+    print(f"DEBUG: [Price Fetch] Starting for {fetch_symbol} (Type: {asset_type})")
+
     try:
         ticker = yf.Ticker(fetch_symbol)
-        price = ticker.fast_info.get('lastPrice', None)
-        if price is not None and price > 0:
-            _cache[symbol] = float(price)
-            return float(price)
+        price = 0.0
+        
+        # Method 1: Fast Info (Quickest)
+        try:
+            p = ticker.fast_info.get('lastPrice', None)
+            if p and p > 0 and not (isinstance(p, float) and (p != p)):
+                price = float(p)
+                print(f"DEBUG: [Price Fetch] Method 1 (FastInfo) success for {fetch_symbol}: {price}")
+        except Exception as e:
+            print(f"DEBUG: [Price Fetch] Method 1 failed for {fetch_symbol}: {e}")
+
+        # Method 2: History (Most Reliable)
+        if price <= 0:
+            try:
+                hist = ticker.history(period="1d")
+                if not hist.empty:
+                    price = float(hist['Close'].iloc[-1])
+                    print(f"DEBUG: [Price Fetch] Method 2 (History) success for {fetch_symbol}: {price}")
+            except Exception as e:
+                print(f"DEBUG: [Price Fetch] Method 2 failed for {fetch_symbol}: {e}")
+
+        # Method 3: Info (Fallback)
+        if price <= 0:
+            try:
+                p = ticker.info.get('currentPrice') or ticker.info.get('regularMarketPrice')
+                if p:
+                    price = float(p)
+                    print(f"DEBUG: [Price Fetch] Method 3 (Info) success for {fetch_symbol}: {price}")
+            except Exception as e:
+                print(f"DEBUG: [Price Fetch] Method 3 failed for {fetch_symbol}: {e}")
+
+        if price > 0:
+            _cache[symbol] = price
+            return price
+        
+        print(f"WARNING: [Price Fetch] All methods FAILED for {fetch_symbol}")
         return 0.0
     except Exception as e:
-        print(f"Error fetching {symbol}: {e}")
+        print(f"CRITICAL: [Price Fetch] Fatal error for {fetch_symbol}: {e}")
         return 0.0
