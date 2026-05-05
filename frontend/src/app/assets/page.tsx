@@ -1,9 +1,12 @@
+'use client';
+
 import { Card, Table, TableHead, TableRow, TableHeaderCell, TableBody, TableCell, Text, Title, Badge, BadgeDelta, Flex } from "@tremor/react";
 import { API_URL } from "../apiConfig";
 import AddAssetForm from './AddAssetForm';
 import AddTransactionForm from './AddTransactionForm';
 import AssetDetailModal from './AssetDetailModal';
 import AssetActions from './AssetActions';
+import { useEffect, useState } from 'react';
 
 interface Asset {
   id: number;
@@ -21,15 +24,27 @@ interface Asset {
   active_real_net_profit: number;
 }
 
-async function getAssets(): Promise<Asset[]> {
-  const res = await fetch(`${API_URL}/assets/`, { cache: 'no-store' });
-  if (!res.ok) return [];
-  return res.json();
-}
+export default function AssetsPage() {
+  const [allAssets, setAllAssets] = useState<Asset[]>([]);
+  const [loading, setLoading] = useState(true);
 
-export default async function AssetsPage() {
-  const allAssets = await getAssets();
-  
+  useEffect(() => {
+    async function fetchAssets() {
+      try {
+        const res = await fetch(`${API_URL}/assets/`);
+        const assets = await res.json();
+        setAllAssets(assets);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchAssets();
+  }, []);
+
+  if (loading) return <div className="p-10 text-center font-bold">Varlıklar Yükleniyor...</div>;
+
   const activeAssets = allAssets.filter((a: Asset) => a.active_quantity > 0);
   const closedAssets = allAssets.filter((a: Asset) => a.active_quantity <= 0);
 

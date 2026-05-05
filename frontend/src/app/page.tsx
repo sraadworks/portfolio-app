@@ -1,5 +1,8 @@
+'use client';
+
 import { Grid, Card, Title, Text, Metric, Flex, ProgressBar } from "@tremor/react";
 import { TremorPerformanceChart, TremorDistributionChart, KpiCard } from './TremorCharts';
+import { useEffect, useState } from 'react';
 import { API_URL } from './apiConfig';
 
 interface Asset {
@@ -17,29 +20,37 @@ interface Asset {
   active_usd_value: number;
 }
 
-async function getAssets(): Promise<Asset[]> {
-  const res = await fetch(`${API_URL}/assets/`, { cache: 'no-store' });
-  if (!res.ok) return [];
-  return res.json();
-}
+export default function Home() {
+  const [data, setData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-async function getCashSummary() {
-  const res = await fetch(`${API_URL}/cash-ledger/summary`, { cache: 'no-store' });
-  if (!res.ok) return { TRY: 0, USD: 0 };
-  return res.json();
-}
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const [assetsRes, cashRes, perfRes] = await Promise.all([
+          fetch(`${API_URL}/assets/`),
+          fetch(`${API_URL}/cash-ledger/summary`),
+          fetch(`${API_URL}/portfolio/performance`)
+        ]);
 
-async function getPerformanceData() {
-  const res = await fetch(`${API_URL}/portfolio/performance`, { cache: 'no-store' });
-  if (!res.ok) return { data: [], available_benchmarks: [] };
-  return res.json();
-}
+        const assets = await assetsRes.json();
+        const cashSummary = await cashRes.json();
+        const performancePayload = await perfRes.json();
 
-export default async function Home() {
-  const assets = await getAssets();
-  const cashSummary = await getCashSummary();
-  const performancePayload = await getPerformanceData();
+        setData({ assets, cashSummary, performancePayload });
+      } catch (err) {
+        console.error("Fetch error:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchData();
+  }, []);
 
+  if (loading) return <div className="p-10 text-center font-bold">Portföy Yükleniyor...</div>;
+  if (!data) return <div className="p-10 text-center text-rose-500">Veri alınamadı.</div>;
+
+  const { assets, cashSummary, performancePayload } = data;
   const totalCashTRY = cashSummary.TRY;
   const totalCashUSD = cashSummary.USD;
 
@@ -70,7 +81,7 @@ export default async function Home() {
   // Prepare Distribution Data
   const assetDistribution = assets.map((a: Asset) => ({
     name: a.symbol,
-    value: a.currency === 'TRY' ? a.active_value : a.active_value * 32.5, // Dummy rate for overview
+    value: a.currency === 'TRY' ? a.active_value : a.active_value * 32.5,
   }));
   if (totalCashTRY > 0) assetDistribution.push({ name: 'Nakit (TL)', value: totalCashTRY });
   if (totalCashUSD > 0) assetDistribution.push({ name: 'Nakit (USD)', value: totalCashUSD * 32.5 });
@@ -122,7 +133,7 @@ export default async function Home() {
           <div className="mt-4 space-y-4">
             <div>
               <Flex>
-                <Text>TL Varlık Reel Getiri (Enflasyon Arındırılmış)</Text>
+                <Text>TL Varlık Reel Getiri</Text>
                 <Text>{totalTRYRealProfit >= 0 ? "+" : ""}{totalTRYRealProfit.toLocaleString()} ₺</Text>
               </Flex>
               <ProgressBar value={Math.min(100, Math.max(0, tryPercent))} color="indigo" className="mt-2" />
