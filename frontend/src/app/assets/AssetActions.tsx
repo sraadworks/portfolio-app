@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { deleteAsset, updateAsset, getAssetTransactions, updateTransaction, deleteTransaction } from './actions';
 
 export default function AssetActions({ asset }: { asset: any }) {
@@ -9,6 +11,7 @@ export default function AssetActions({ asset }: { asset: any }) {
   const [showEdit, setShowEdit] = useState(false);
   const [loading, setLoading] = useState(false);
   const [transactions, setTransactions] = useState<any[]>([]);
+  const router = useRouter();
 
   useEffect(() => {
     if (showEdit) {
@@ -21,6 +24,7 @@ export default function AssetActions({ asset }: { asset: any }) {
     await deleteAsset(asset.id);
     setShowConfirm(false);
     setLoading(false);
+    router.refresh();
   }
 
   async function handleAssetEdit(formData: FormData) {
@@ -28,6 +32,7 @@ export default function AssetActions({ asset }: { asset: any }) {
     const result = await updateAsset(asset.id, formData);
     if (!result.error) {
       setShowEdit(false);
+      router.refresh();
     }
     setLoading(false);
   }
@@ -38,6 +43,7 @@ export default function AssetActions({ asset }: { asset: any }) {
     const txs = await getAssetTransactions(asset.id);
     setTransactions(txs);
     setLoading(false);
+    router.refresh();
   }
 
   async function handleTxDelete(txId: number) {
@@ -47,24 +53,32 @@ export default function AssetActions({ asset }: { asset: any }) {
     const txs = await getAssetTransactions(asset.id);
     setTransactions(txs);
     setLoading(false);
+    router.refresh();
   }
 
   return (
     <>
-      <div className="flex gap-1 justify-center">
+      <div className="flex gap-1 justify-center items-center">
+        <Link
+          href={`/assets/${asset.id}/analysis`}
+          className="text-slate-400 hover:text-emerald-400 text-xs font-medium px-2 py-1 rounded-md hover:bg-slate-800/50 transition-colors"
+          title="Özet & İncele"
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
+        </Link>
         <button
           onClick={() => setShowEdit(true)}
           className="text-slate-400 hover:text-blue-400 text-xs font-medium px-2 py-1 rounded-md hover:bg-slate-800/50 transition-colors"
           title="Düzenle"
         >
-          ✏️
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
         </button>
         <button
           onClick={() => setShowConfirm(true)}
           className="text-slate-400 hover:text-rose-400 text-xs font-medium px-2 py-1 rounded-md hover:bg-slate-800/50 transition-colors"
           title="Sil"
         >
-          🗑️
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
         </button>
       </div>
 

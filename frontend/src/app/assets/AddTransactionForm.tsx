@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { createTransaction } from './actions';
 import { API_URL } from '../apiConfig';
 
@@ -8,6 +9,7 @@ export default function AddTransactionForm({ assets }: { assets: any[] }) {
   const [isOpen, setIsOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [usdRate, setUsdRate] = useState<string>('');
+  const router = useRouter();
 
   const fetchUsdRate = async () => {
     try {
@@ -35,6 +37,7 @@ export default function AddTransactionForm({ assets }: { assets: any[] }) {
       setIsOpen(false);
       setError(null);
       setUsdRate('');
+      router.refresh();
     }
   }
 

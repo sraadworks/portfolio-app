@@ -1,11 +1,13 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { createAsset } from './actions';
 
 export default function AddAssetForm() {
   const [isOpen, setIsOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   async function action(formData: FormData) {
     const result = await createAsset(formData);
@@ -14,6 +16,7 @@ export default function AddAssetForm() {
     } else {
       setIsOpen(false);
       setError(null);
+      router.refresh();
     }
   }
 
