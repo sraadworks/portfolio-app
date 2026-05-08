@@ -4,7 +4,7 @@ import { Card, Table, TableHead, TableRow, TableHeaderCell, TableBody, TableCell
 import { API_URL } from "../apiConfig";
 import AddAssetForm from './AddAssetForm';
 import AddTransactionForm from './AddTransactionForm';
-import AssetDetailModal from './AssetDetailModal';
+import Link from 'next/link';
 import AssetActions from './AssetActions';
 import { useEffect, useState } from 'react';
 
@@ -127,7 +127,7 @@ export default function AssetsPage() {
                       <Text className="text-[10px] text-slate-400">Enflasyon Arındırılmış</Text>
                     </TableCell>
                     <TableCell className="text-center">
-                      <AssetDetailModal asset={asset} />
+                      <Link href={`/assets/${asset.id}/analysis`} className="text-blue-600 hover:text-blue-800 text-xs font-semibold px-2 py-1 rounded-md hover:bg-blue-50 transition-colors">Özet</Link>
                     </TableCell>
                     <TableCell className="text-center">
                       <AssetActions asset={asset} />
@@ -198,7 +198,7 @@ export default function AssetsPage() {
                       </Text>
                     </TableCell>
                     <TableCell className="text-center">
-                      <AssetDetailModal asset={asset} />
+                      <Link href={`/assets/${asset.id}/analysis`} className="text-blue-600 hover:text-blue-800 text-xs font-semibold px-2 py-1 rounded-md hover:bg-blue-50 transition-colors">Özet</Link>
                     </TableCell>
                     <TableCell className="text-center">
                       <AssetActions asset={asset} />

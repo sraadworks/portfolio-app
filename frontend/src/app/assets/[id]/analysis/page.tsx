@@ -46,15 +46,28 @@ interface Transaction {
 }
 
 async function getAsset(id: string): Promise<Asset | undefined> {
-  const res = await fetch(`${API_URL}/assets/`, { cache: 'no-store' });
-  const assets = await res.json();
-  return assets.find((a: any) => a.id.toString() === id);
+  try {
+    const res = await fetch(`${API_URL}/assets/`, { cache: 'no-store' });
+    if (!res.ok) return undefined;
+    const assets = await res.json();
+    if (!Array.isArray(assets)) return undefined;
+    return assets.find((a: any) => a.id.toString() === id);
+  } catch (err) {
+    console.error("Failed to fetch asset:", err);
+    return undefined;
+  }
 }
 
 async function getTransactions(id: string): Promise<Transaction[]> {
-  const res = await fetch(`${API_URL}/transactions/${id}`, { cache: 'no-store' });
-  if (!res.ok) return [];
-  return res.json();
+  try {
+    const res = await fetch(`${API_URL}/transactions/${id}`, { cache: 'no-store' });
+    if (!res.ok) return [];
+    const data = await res.json();
+    return Array.isArray(data) ? data : [];
+  } catch (err) {
+    console.error("Failed to fetch transactions:", err);
+    return [];
+  }
 }
 
 function fmt(val: number) {
