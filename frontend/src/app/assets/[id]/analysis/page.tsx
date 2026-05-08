@@ -1,6 +1,9 @@
+'use client';
+
 import { Card, Title, Text, Flex, Badge, BadgeDelta, Table, TableHead, TableRow, TableHeaderCell, TableBody, TableCell, Grid, Metric, List, ListItem, Divider, Button } from "@tremor/react";
 import { API_URL } from "../../../apiConfig";
 import Link from 'next/link';
+import { use, useEffect, useState } from 'react';
 
 interface Asset {
   id: number;
@@ -45,42 +48,56 @@ interface Transaction {
   commission: number;
 }
 
-async function getAsset(id: string): Promise<Asset | undefined> {
-  try {
-    const res = await fetch(`${API_URL}/assets/`, { cache: 'no-store' });
-    if (!res.ok) return undefined;
-    const assets = await res.json();
-    if (!Array.isArray(assets)) return undefined;
-    return assets.find((a: any) => a.id.toString() === id);
-  } catch (err) {
-    console.error("Failed to fetch asset:", err);
-    return undefined;
-  }
-}
-
-async function getTransactions(id: string): Promise<Transaction[]> {
-  try {
-    const res = await fetch(`${API_URL}/transactions/${id}`, { cache: 'no-store' });
-    if (!res.ok) return [];
-    const data = await res.json();
-    return Array.isArray(data) ? data : [];
-  } catch (err) {
-    console.error("Failed to fetch transactions:", err);
-    return [];
-  }
-}
-
 function fmt(val: number) {
   return val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
-export default async function AssetAnalysisPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  const asset = await getAsset(id);
-  const transactions = await getTransactions(id);
+export default function AssetAnalysisPage({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = use(params);
+  const id = resolvedParams.id;
+  
+  const [asset, setAsset] = useState<Asset | null>(null);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const [assetsRes, txsRes] = await Promise.all([
+          fetch(`${API_URL}/assets/`),
+          fetch(`${API_URL}/transactions/${id}`)
+        ]);
+
+        if (assetsRes.ok) {
+          const assetsData = await assetsRes.json();
+          if (Array.isArray(assetsData)) {
+            const found = assetsData.find((a: any) => a.id.toString() === id);
+            if (found) setAsset(found);
+          }
+        }
+
+        if (txsRes.ok) {
+          const txsData = await txsRes.json();
+          if (Array.isArray(txsData)) {
+            setTransactions(txsData);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch data:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    
+    fetchData();
+  }, [id]);
+
+  if (loading) {
+    return <Card className="m-10 text-center font-bold">Analiz Verileri Yükleniyor...</Card>;
+  }
 
   if (!asset) {
-    return <Card className="m-10 text-center">Varlık bulunamadı.</Card>;
+    return <Card className="m-10 text-center text-rose-500">Özet sayfası yüklenemedi. (Varlık bulunamadı veya sunucuya bağlanılamadı)</Card>;
   }
 
   // Calculate monthly percentage
