@@ -30,19 +30,19 @@ export default function CpiActions({ item }: { item: any }) {
   if (editing) {
     return (
       <form action={handleUpdate} className="flex items-center gap-2 justify-end">
-        {error && <span className="text-xs text-red-500">{error}</span>}
+        {error && <span className="text-xs text-rose-400">{error}</span>}
         <input
           required
           step="0.01"
           name="cpi_value"
           type="number"
           defaultValue={item.cpi_value}
-          className="w-24 border border-slate-300 rounded px-2 py-1 text-sm text-right focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className="w-24 bg-[#0B0F19] border border-slate-700 rounded px-2 py-1 text-sm text-white text-right focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
         />
-        <button type="submit" disabled={loading} className="text-xs font-semibold text-blue-600 hover:text-blue-800 disabled:opacity-50">
+        <button type="submit" disabled={loading} className="text-xs font-medium text-blue-400 hover:text-blue-300 disabled:opacity-50 px-2 py-1 bg-blue-500/10 rounded border border-blue-500/20 transition-colors">
           Kaydet
         </button>
-        <button type="button" onClick={() => setEditing(false)} className="text-xs font-semibold text-slate-400 hover:text-slate-600">
+        <button type="button" onClick={() => setEditing(false)} className="text-xs font-medium text-slate-400 hover:text-slate-300 px-2 py-1 bg-transparent rounded border border-slate-700 transition-colors">
           İptal
         </button>
       </form>
@@ -50,18 +50,18 @@ export default function CpiActions({ item }: { item: any }) {
   }
 
   return (
-    <div className="flex items-center gap-3 justify-end">
+    <div className="flex items-center gap-2 justify-end">
       <button
         onClick={() => setEditing(true)}
         disabled={loading}
-        className="text-xs font-semibold text-blue-600 hover:text-blue-800 disabled:opacity-50"
+        className="text-xs font-medium text-slate-400 hover:text-blue-400 disabled:opacity-50 px-2 py-1 rounded hover:bg-slate-800 transition-colors"
       >
         Düzenle
       </button>
       <button
         onClick={handleDelete}
         disabled={loading}
-        className="text-xs font-semibold text-rose-500 hover:text-rose-700 disabled:opacity-50"
+        className="text-xs font-medium text-slate-400 hover:text-rose-400 disabled:opacity-50 px-2 py-1 rounded hover:bg-slate-800 transition-colors"
       >
         Sil
       </button>
