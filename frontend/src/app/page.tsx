@@ -121,8 +121,7 @@ export default function Home() {
       </Grid>
 
 
-      <Grid numItemsMd={1} numItemsLg={2} className="gap-6 mt-6">
-        <TremorDistributionChart data={assetDistribution.sort((a: any, b: any) => b.value - a.value)} title="Varlık Dağılımı (TL Bazlı)" />
+      <Grid numItemsMd={1} numItemsLg={1} className="gap-6 mt-6">
         <Card>
           <Title>Portföy Sağlığı</Title>
           <div className="mt-4 space-y-4">
