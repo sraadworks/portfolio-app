@@ -1,7 +1,5 @@
 'use client';
 
-import { Grid, Card, Title, Text, Metric, Flex, ProgressBar } from "@tremor/react";
-import { TremorPerformanceChart, TremorDistributionChart, KpiCard } from './TremorCharts';
 import { useEffect, useState } from 'react';
 import { API_URL } from './apiConfig';
 
@@ -87,61 +85,118 @@ export default function Home() {
   if (totalCashUSD > 0) assetDistribution.push({ name: 'Nakit (USD)', value: totalCashUSD * 32.5 });
 
   return (
-    <div className="space-y-6">
-      <Title>Yatırım Portföyü Dashboard</Title>
-      <Text>Portföyünüzün gerçek zamanlı performans ve dağılım analizi.</Text>
+    <div className="flex flex-col h-full max-w-6xl">
+      {/* Header Area */}
+      <div className="flex justify-between items-end mb-8">
+        <div>
+          <h1 className="text-2xl font-semibold text-white tracking-tight">Portföy Özeti</h1>
+          <p className="text-sm text-slate-400 mt-1">Son güncelleme: {new Date().toLocaleString('tr-TR', { dateStyle: 'short', timeStyle: 'short' })}</p>
+        </div>
+        <div className="flex gap-4">
+          {/* Optional Filter/Action Buttons Placeholder */}
+          <button className="px-4 py-2 border border-slate-800 bg-slate-900/50 hover:bg-slate-800 rounded-md text-sm font-medium text-slate-300 transition-colors">
+            Filtreler
+          </button>
+        </div>
+      </div>
 
-      <Grid numItemsMd={2} numItemsLg={4} className="gap-6 mt-6">
-        <KpiCard 
-          title="Toplam TL Varlık" 
-          metric={`₺${totalTRYValue.toLocaleString()}`} 
-          delta={`%${tryPercent.toFixed(1)}`}
-          deltaType={tryPercent >= 0 ? "moderateIncrease" : "moderateDecrease"}
-          subtitle={`Brüt Kâr: ₺${totalTRYGrossProfit.toLocaleString()}`}
-        />
-        <KpiCard 
-          title="TL Varlık USD Bazlı" 
-          metric={`%${tryUSDPercent.toFixed(1)}`} 
-          delta={tryUSDPercent >= 0 ? "Pozitif" : "Negatif"}
-          deltaType={tryUSDPercent >= 0 ? "increase" : "decrease"}
-          subtitle="Döviz bazlı reel getiri"
-        />
-        <KpiCard 
-          title="Toplam USD Portföy" 
-          metric={`$${totalUSDValue.toLocaleString()}`} 
-          delta={`%${usdPercent.toFixed(1)}`}
-          deltaType={usdPercent >= 0 ? "moderateIncrease" : "moderateDecrease"}
-          subtitle={`Net USD Kâr: $${totalUSDProfit.toLocaleString()}`}
-        />
-        <KpiCard 
-          title="Toplam Nakit" 
-          metric={`₺${totalCashTRY.toLocaleString()}`} 
-          subtitle={`USD Nakit: $${totalCashUSD.toLocaleString()}`}
-        />
-      </Grid>
-
-
-      <Grid numItemsMd={1} numItemsLg={1} className="gap-6 mt-6">
-        <Card>
-          <Title>Portföy Sağlığı</Title>
-          <div className="mt-4 space-y-4">
-            <div>
-              <Flex>
-                <Text>TL Varlık Reel Getiri</Text>
-                <Text>{totalTRYRealProfit >= 0 ? "+" : ""}{totalTRYRealProfit.toLocaleString()} ₺</Text>
-              </Flex>
-              <ProgressBar value={Math.min(100, Math.max(0, tryPercent))} color="indigo" className="mt-2" />
+      {/* Main KPI Board */}
+      <div className="border border-slate-800/60 rounded-xl overflow-hidden bg-[#0B0F19] shadow-2xl shadow-black/50">
+        
+        {/* ROW 1: PRIMARY METRIC (TL VALUE) */}
+        <div className="p-8 border-b border-slate-800/60 hover:bg-slate-800/20 transition-colors relative group">
+          <div className="flex items-center gap-2 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">
+            Toplam TL Varlık
+            <svg className="w-3.5 h-3.5 text-slate-500 cursor-help" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          </div>
+          <div className="flex items-end gap-5">
+            <div className="text-5xl font-semibold text-white tracking-tight">
+              ₺{totalTRYValue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
             </div>
-            <div>
-              <Flex>
-                <Text>USD Bazlı Büyüme</Text>
-                <Text>%{usdPercent.toFixed(1)}</Text>
-              </Flex>
-              <ProgressBar value={Math.min(100, Math.max(0, usdPercent))} color="cyan" className="mt-2" />
+            <div className={`flex items-center gap-1.5 text-base font-medium pb-1.5 ${tryPercent >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+              {tryPercent >= 0 ? (
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18" /></svg>
+              ) : (
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg>
+              )}
+              %{Math.abs(tryPercent).toFixed(2)}
             </div>
           </div>
-        </Card>
-      </Grid>
+          <div className="mt-3 text-sm text-slate-500 font-medium">
+            Brüt Kâr: <span className={totalTRYGrossProfit >= 0 ? "text-emerald-500/80" : "text-rose-500/80"}>
+              {totalTRYGrossProfit >= 0 ? "+" : ""}₺{totalTRYGrossProfit.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+            </span>
+          </div>
+        </div>
+
+        {/* ROW 2: SPLIT METRICS (USD & CASH) */}
+        <div className="grid grid-cols-2 border-b border-slate-800/60">
+          <div className="p-8 border-r border-slate-800/60 hover:bg-slate-800/20 transition-colors">
+            <div className="flex items-center gap-2 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">
+              Toplam USD Portföy
+            </div>
+            <div className="flex items-end gap-4">
+              <div className="text-4xl font-semibold text-white tracking-tight">
+                ${totalUSDValue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+              </div>
+              <div className={`flex items-center gap-1 text-sm font-medium pb-1 ${usdPercent >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                {usdPercent >= 0 ? '▲' : '▼'} %{Math.abs(usdPercent).toFixed(2)}
+              </div>
+            </div>
+            <div className="mt-3 text-sm text-slate-500 font-medium">
+              Net USD Kâr: <span className={totalUSDProfit >= 0 ? "text-emerald-500/80" : "text-rose-500/80"}>
+                {totalUSDProfit >= 0 ? "+" : ""}${totalUSDProfit.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+              </span>
+            </div>
+          </div>
+
+          <div className="p-8 hover:bg-slate-800/20 transition-colors">
+            <div className="flex items-center gap-2 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">
+              Toplam Nakit
+            </div>
+            <div className="text-4xl font-semibold text-white tracking-tight">
+              ₺{totalCashTRY.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+            </div>
+            <div className="mt-3 text-sm text-slate-500 font-medium">
+              USD Kasa: <span className="text-blue-400/80">${totalCashUSD.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* ROW 3: HEALTH INDICATORS */}
+        <div className="grid grid-cols-2">
+          <div className="p-8 border-r border-slate-800/60 hover:bg-slate-800/20 transition-colors">
+            <div className="flex items-center gap-2 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">
+              Reel Getiri (Enflasyon Arındırılmış)
+            </div>
+            <div className={`text-3xl font-semibold tracking-tight ${totalTRYRealProfit >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+              {totalTRYRealProfit >= 0 ? "+" : ""}₺{totalTRYRealProfit.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+            </div>
+            <div className="mt-4 w-full h-1 bg-slate-800 rounded-full overflow-hidden">
+              <div 
+                className={`h-full ${totalTRYRealProfit >= 0 ? 'bg-emerald-500' : 'bg-rose-500'}`} 
+                style={{ width: `${Math.min(100, Math.max(0, Math.abs(tryPercent)))}%` }}
+              />
+            </div>
+          </div>
+
+          <div className="p-8 hover:bg-slate-800/20 transition-colors">
+            <div className="flex items-center gap-2 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">
+              TL Varlıkların Döviz (USD) Performansı
+            </div>
+            <div className={`text-3xl font-semibold tracking-tight ${tryUSDPercent >= 0 ? 'text-blue-400' : 'text-rose-400'}`}>
+              {tryUSDPercent >= 0 ? "+" : ""}%{tryUSDPercent.toFixed(2)}
+            </div>
+            <div className="mt-4 w-full h-1 bg-slate-800 rounded-full overflow-hidden">
+              <div 
+                className={`h-full ${tryUSDPercent >= 0 ? 'bg-blue-500' : 'bg-rose-500'}`} 
+                style={{ width: `${Math.min(100, Math.max(0, Math.abs(tryUSDPercent)))}%` }}
+              />
+            </div>
+          </div>
+        </div>
+
+      </div>
     </div>
   );
 }
