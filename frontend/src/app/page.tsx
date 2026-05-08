@@ -120,11 +120,6 @@ export default function Home() {
         />
       </Grid>
 
-      <TremorPerformanceChart 
-        data={performancePayload.data} 
-        categories={["Portföy", ...performancePayload.available_benchmarks.map((b: string) => `${b}_pct`)]}
-        colors={["indigo", "cyan", "amber", "rose", "emerald"]}
-      />
 
       <Grid numItemsMd={1} numItemsLg={2} className="gap-6 mt-6">
         <TremorDistributionChart data={assetDistribution.sort((a: any, b: any) => b.value - a.value)} title="Varlık Dağılımı (TL Bazlı)" />
