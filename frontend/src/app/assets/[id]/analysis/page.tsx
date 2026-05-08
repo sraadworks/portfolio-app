@@ -1,6 +1,5 @@
 'use client';
 
-import { Card, Title, Text, Flex, Badge, BadgeDelta, Table, TableHead, TableRow, TableHeaderCell, TableBody, TableCell, Grid, Metric, List, ListItem, Divider, Button } from "@tremor/react";
 import { API_URL } from "../../../apiConfig";
 import Link from 'next/link';
 import { use, useEffect, useState } from 'react';
@@ -93,11 +92,19 @@ export default function AssetAnalysisPage({ params }: { params: Promise<{ id: st
   }, [id]);
 
   if (loading) {
-    return <Card className="m-10 text-center font-bold">Analiz Verileri Yükleniyor...</Card>;
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="text-center font-bold text-slate-400 animate-pulse">Analiz Verileri Yükleniyor...</div>
+      </div>
+    );
   }
 
   if (!asset) {
-    return <Card className="m-10 text-center text-rose-500">Özet sayfası yüklenemedi. (Varlık bulunamadı veya sunucuya bağlanılamadı)</Card>;
+    return (
+      <div className="p-10 border border-rose-500/20 rounded-xl bg-rose-500/10 text-center text-rose-400 font-medium">
+        Özet sayfası yüklenemedi. (Varlık bulunamadı veya sunucuya bağlanılamadı)
+      </div>
+    );
   }
 
   // Calculate monthly percentage
@@ -123,174 +130,224 @@ export default function AssetAnalysisPage({ params }: { params: Promise<{ id: st
   }
 
   return (
-    <div className="space-y-6">
-      <Flex justifyContent="start" className="gap-4">
+    <div className="space-y-8 max-w-7xl mx-auto w-full pb-10">
+      {/* Header */}
+      <div className="flex items-center gap-6">
         <Link href="/assets">
-          <Button variant="secondary" icon={() => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline' }}><path d="m15 18-6-6 6-6"/></svg>}>
-            Geri
-          </Button>
+          <button className="flex items-center justify-center w-10 h-10 bg-slate-900/40 border border-slate-800 rounded-xl hover:text-white text-slate-400 hover:bg-slate-800 transition-colors shadow-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+          </button>
         </Link>
         <div>
-          <Title className="text-3xl font-black">{asset.symbol}</Title>
-          <Text>{asset.name} · {asset.asset_type}</Text>
+          <h1 className="text-3xl font-black text-white tracking-tight">{asset.symbol}</h1>
+          <p className="text-sm font-medium text-slate-400 mt-1">{asset.name} <span className="text-slate-600 px-1">•</span> {asset.asset_type}</p>
         </div>
-      </Flex>
+      </div>
 
-      <Grid numItemsMd={2} numItemsLg={4} className="gap-4">
-        <Card decoration="top" decorationColor="indigo">
-          <Text>Toplam Maliyet</Text>
-          <Metric>{fmt(asset.total_cost)} {asset.currency}</Metric>
-        </Card>
-        <Card decoration="top" decorationColor="emerald">
-          <Text>Toplam Brüt Kâr</Text>
-          <Flex>
-            <Metric>
+      {/* KPI Grid 1 */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="p-6 border border-slate-800/60 rounded-xl bg-[#0B0F19] shadow-2xl shadow-black/40 relative overflow-hidden group hover:border-slate-700/80 transition-colors">
+          <div className="absolute top-0 left-0 w-full h-1 bg-indigo-500/50"></div>
+          <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Toplam Maliyet</div>
+          <div className="text-2xl font-semibold text-white tracking-tight">{fmt(asset.total_cost)} {asset.currency}</div>
+        </div>
+        
+        <div className="p-6 border border-slate-800/60 rounded-xl bg-[#0B0F19] shadow-2xl shadow-black/40 relative overflow-hidden group hover:border-slate-700/80 transition-colors">
+          <div className="absolute top-0 left-0 w-full h-1 bg-emerald-500/50"></div>
+          <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Toplam Brüt Kâr</div>
+          <div className="flex items-end justify-between">
+            <div className="text-2xl font-semibold text-white tracking-tight">
               {asset.total_gross_profit >= 0 ? "+" : ""}{fmt(asset.total_gross_profit)}
-            </Metric>
-            <BadgeDelta deltaType={asset.total_gross_profit >= 0 ? "moderateIncrease" : "moderateDecrease"}>
-              %{(asset.total_cost > 0 ? (asset.total_gross_profit / asset.total_cost * 100) : 0).toFixed(1)}
-            </BadgeDelta>
-          </Flex>
-        </Card>
-        <Card decoration="top" decorationColor="slate">
-          <Text>Reel Net Kâr (Enflasyon Arındırılmış)</Text>
-          <Metric>
+            </div>
+            <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-bold border ${asset.total_gross_profit >= 0 ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border-rose-500/20'}`}>
+              {asset.total_gross_profit >= 0 ? '▲' : '▼'} %{(asset.total_cost > 0 ? (asset.total_gross_profit / asset.total_cost * 100) : 0).toFixed(1)}
+            </span>
+          </div>
+        </div>
+
+        <div className="p-6 border border-slate-800/60 rounded-xl bg-[#0B0F19] shadow-2xl shadow-black/40 relative overflow-hidden group hover:border-slate-700/80 transition-colors">
+          <div className="absolute top-0 left-0 w-full h-1 bg-slate-500/50"></div>
+          <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Reel Net Kâr <span className="normal-case font-normal text-slate-500">(Enflasyon Arındırılmış)</span></div>
+          <div className={`text-2xl font-semibold tracking-tight ${asset.total_real_net_profit >= 0 ? 'text-white' : 'text-rose-400'}`}>
             {asset.total_real_net_profit >= 0 ? "+" : ""}{fmt(asset.total_real_net_profit)}
-          </Metric>
-        </Card>
-        <Card decoration="top" decorationColor="blue">
-          <Text>Aylık Ortalama Getiri</Text>
-          <Metric>
+          </div>
+        </div>
+
+        <div className="p-6 border border-slate-800/60 rounded-xl bg-[#0B0F19] shadow-2xl shadow-black/40 relative overflow-hidden group hover:border-slate-700/80 transition-colors">
+          <div className="absolute top-0 left-0 w-full h-1 bg-blue-500/50"></div>
+          <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Aylık Ortalama Getiri</div>
+          <div className={`text-2xl font-semibold tracking-tight ${monthlyPercent >= 0 ? 'text-white' : 'text-rose-400'}`}>
             {monthlyPercent >= 0 ? "+" : ""}{monthlyPercent.toFixed(2)}%
-          </Metric>
-        </Card>
-      </Grid>
+          </div>
+        </div>
+      </div>
 
-      <Grid numItemsMd={1} numItemsLg={2} className="gap-6">
-        <Card>
-          <Flex>
-            <Title>Aktif Pozisyon</Title>
-            <Badge color="emerald">Açık</Badge>
-          </Flex>
+      {/* Main Analysis Cards */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="p-6 border border-slate-800/60 rounded-xl bg-[#0B0F19] shadow-2xl shadow-black/40">
+          <div className="flex justify-between items-center mb-6 pb-4 border-b border-slate-800/60">
+            <h2 className="text-lg font-semibold text-white tracking-tight">Aktif Pozisyon</h2>
+            {asset.active_quantity > 0 ? (
+              <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 uppercase tracking-wider">Açık</span>
+            ) : (
+              <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold bg-slate-500/10 text-slate-400 border border-slate-500/20 uppercase tracking-wider">Kapalı</span>
+            )}
+          </div>
+          
           {asset.active_quantity > 0 ? (
-            <List className="mt-4">
-              <ListItem>
-                <span>Kalan Adet</span>
-                <span className="font-bold">{asset.active_quantity}</span>
-              </ListItem>
-              <ListItem>
-                <span>Güncel Fiyat</span>
-                <span className="font-bold">{fmt(asset.current_price)} {asset.currency}</span>
-              </ListItem>
-              <ListItem>
-                <span>Toplam Değer</span>
-                <span className="font-bold">{fmt(asset.active_value)} {asset.currency}</span>
-              </ListItem>
-              <ListItem>
-                <span>Elde Tutma Süresi</span>
-                <span className="font-bold">{asset.active_holding_days} Gün</span>
-              </ListItem>
-              <Divider />
-              <ListItem>
-                <span className="font-bold">Aktif Brüt Kâr</span>
-                <Text color={asset.active_gross_profit >= 0 ? "emerald" : "rose"} className="font-black text-lg">
-                  {asset.active_gross_profit >= 0 ? "+" : ""}{fmt(asset.active_gross_profit)} {asset.currency}
-                </Text>
-              </ListItem>
-              <ListItem>
-                <span>Enflasyon Kaybı</span>
-                <Text color="amber" className="font-bold">-{fmt(asset.active_inflation_diff)} {asset.currency}</Text>
-              </ListItem>
+            <ul className="space-y-4">
+              <li className="flex justify-between items-center text-sm">
+                <span className="text-slate-400 font-medium">Kalan Adet</span>
+                <span className="font-semibold text-white">{asset.active_quantity}</span>
+              </li>
+              <li className="flex justify-between items-center text-sm">
+                <span className="text-slate-400 font-medium">Güncel Fiyat</span>
+                <span className="font-semibold text-white">{fmt(asset.current_price)} <span className="text-slate-500 font-normal ml-0.5">{asset.currency}</span></span>
+              </li>
+              <li className="flex justify-between items-center text-sm">
+                <span className="text-slate-400 font-medium">Toplam Değer</span>
+                <span className="font-semibold text-white">{fmt(asset.active_value)} <span className="text-slate-500 font-normal ml-0.5">{asset.currency}</span></span>
+              </li>
+              <li className="flex justify-between items-center text-sm">
+                <span className="text-slate-400 font-medium">Elde Tutma Süresi</span>
+                <span className="font-semibold text-white">{asset.active_holding_days} Gün</span>
+              </li>
+              <div className="h-px bg-slate-800/60 my-5"></div>
+              <li className="flex justify-between items-center text-sm">
+                <span className="text-slate-300 font-bold">Aktif Brüt Kâr</span>
+                <span className={`font-black text-xl tracking-tight ${asset.active_gross_profit >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
+                  {asset.active_gross_profit >= 0 ? "+" : ""}{fmt(asset.active_gross_profit)} <span className="text-sm font-normal opacity-50">{asset.currency}</span>
+                </span>
+              </li>
+              <li className="flex justify-between items-center text-sm">
+                <span className="text-slate-400 font-medium">Enflasyon Kaybı</span>
+                <span className="font-semibold text-amber-500">-{fmt(asset.active_inflation_diff)} <span className="text-amber-500/50 font-normal ml-0.5">{asset.currency}</span></span>
+              </li>
+              
               {asset.currency === 'TRY' && (
-                <Card className="mt-4 bg-blue-50/50 border-blue-100 ring-0">
-                  <Flex>
+                <div className="mt-6 p-4 bg-blue-500/5 border border-blue-500/20 rounded-xl relative overflow-hidden">
+                  <div className="absolute top-0 left-0 w-1 h-full bg-blue-500/50"></div>
+                  <div className="flex justify-between items-center pl-2">
                     <div>
-                      <Text className="font-bold text-blue-800">Dolar Bazlı Getiri</Text>
-                      <Metric className="text-xl text-blue-600">
+                      <div className="text-[10px] font-bold text-blue-400 uppercase tracking-wider mb-1">Dolar Bazlı Getiri</div>
+                      <div className="text-2xl font-bold text-blue-400 tracking-tight">
                         {asset.active_usd_profit >= 0 ? "+" : ""}${fmt(asset.active_usd_profit)}
-                      </Metric>
+                      </div>
                     </div>
-                    <BadgeDelta deltaType={asset.active_usd_percent >= 0 ? "increase" : "decrease"}>
-                      %{asset.active_usd_percent?.toFixed(2)}
-                    </BadgeDelta>
-                  </Flex>
-                </Card>
+                    <span className={`inline-flex items-center px-2.5 py-1 rounded text-xs font-bold border ${asset.active_usd_percent >= 0 ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border-rose-500/20'}`}>
+                      {asset.active_usd_percent >= 0 ? '▲' : '▼'} %{asset.active_usd_percent?.toFixed(2)}
+                    </span>
+                  </div>
+                </div>
               )}
-            </List>
+            </ul>
           ) : (
-            <Text className="mt-10 text-center italic">Aktif pozisyon bulunmamaktadır.</Text>
+            <div className="py-12 text-center italic text-slate-500 text-sm border border-dashed border-slate-800 rounded-xl bg-slate-900/20">Aktif pozisyon bulunmamaktadır.</div>
           )}
-        </Card>
+        </div>
 
-        <Card>
-          <Title>Kapanan (Gerçekleşen) İşlemler</Title>
+        <div className="p-6 border border-slate-800/60 rounded-xl bg-[#0B0F19] shadow-2xl shadow-black/40">
+          <div className="flex justify-between items-center mb-6 pb-4 border-b border-slate-800/60">
+            <h2 className="text-lg font-semibold text-white tracking-tight">Kapanan (Gerçekleşen) İşlemler</h2>
+          </div>
+          
           {asset.realized_revenue > 0 ? (
-            <List className="mt-4">
-              <ListItem>
-                <span>Satış Geliri</span>
-                <span className="font-bold">{fmt(asset.realized_revenue)} {asset.currency}</span>
-              </ListItem>
-              <ListItem>
-                <span>Satılan Maliyet</span>
-                <span className="font-bold">{fmt(asset.realized_cost)} {asset.currency}</span>
-              </ListItem>
-              <ListItem>
-                <span>Gerçekleşen Brüt Kâr</span>
-                <Text color={asset.realized_gross_profit >= 0 ? "emerald" : "rose"} className="font-bold">
-                  {asset.realized_gross_profit >= 0 ? "+" : ""}{fmt(asset.realized_gross_profit)} {asset.currency}
-                </Text>
-              </ListItem>
-              <ListItem>
-                <span>Enflasyon Erimesi</span>
-                <Text color="amber" className="font-bold">-{fmt(asset.realized_inflation_diff)} {asset.currency}</Text>
-              </ListItem>
-              <Divider />
-              <ListItem>
-                <span className="font-bold">Gerçekleşen Reel Kâr</span>
-                <Metric className="text-lg">
-                  {asset.realized_real_net_profit >= 0 ? "+" : ""}{fmt(asset.realized_real_net_profit)} {asset.currency}
-                </Metric>
-              </ListItem>
-            </List>
+            <ul className="space-y-4">
+              <li className="flex justify-between items-center text-sm">
+                <span className="text-slate-400 font-medium">Satış Geliri</span>
+                <span className="font-semibold text-white">{fmt(asset.realized_revenue)} <span className="text-slate-500 font-normal ml-0.5">{asset.currency}</span></span>
+              </li>
+              <li className="flex justify-between items-center text-sm">
+                <span className="text-slate-400 font-medium">Satılan Maliyet</span>
+                <span className="font-semibold text-white">{fmt(asset.realized_cost)} <span className="text-slate-500 font-normal ml-0.5">{asset.currency}</span></span>
+              </li>
+              <li className="flex justify-between items-center text-sm">
+                <span className="text-slate-400 font-medium">Gerçekleşen Brüt Kâr</span>
+                <span className={`font-bold ${asset.realized_gross_profit >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
+                  {asset.realized_gross_profit >= 0 ? "+" : ""}{fmt(asset.realized_gross_profit)} <span className="opacity-50 font-normal ml-0.5">{asset.currency}</span>
+                </span>
+              </li>
+              <li className="flex justify-between items-center text-sm">
+                <span className="text-slate-400 font-medium">Enflasyon Erimesi</span>
+                <span className="font-semibold text-amber-500">-{fmt(asset.realized_inflation_diff)} <span className="text-amber-500/50 font-normal ml-0.5">{asset.currency}</span></span>
+              </li>
+              <div className="h-px bg-slate-800/60 my-5"></div>
+              <li className="flex justify-between items-center text-sm">
+                <span className="text-slate-300 font-bold">Gerçekleşen Reel Kâr</span>
+                <span className={`font-black text-xl tracking-tight ${asset.realized_real_net_profit >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
+                  {asset.realized_real_net_profit >= 0 ? "+" : ""}{fmt(asset.realized_real_net_profit)} <span className="text-sm font-normal opacity-50">{asset.currency}</span>
+                </span>
+              </li>
+            </ul>
           ) : (
-            <Text className="mt-10 text-center italic">Gerçekleşmiş bir satış işlemi bulunmamaktadır.</Text>
+            <div className="py-12 text-center italic text-slate-500 text-sm border border-dashed border-slate-800 rounded-xl bg-slate-900/20">Gerçekleşmiş bir satış işlemi bulunmamaktadır.</div>
           )}
-        </Card>
-      </Grid>
+        </div>
+      </div>
 
-      <Card>
-        <Title>İşlem Geçmişi</Title>
-        <Table className="mt-5">
-          <TableHead>
-            <TableRow>
-              <TableHeaderCell>Tarih</TableHeaderCell>
-              <TableHeaderCell>İşlem</TableHeaderCell>
-              <TableHeaderCell className="text-right">Adet/Tutar</TableHeaderCell>
-              <TableHeaderCell className="text-right">Fiyat</TableHeaderCell>
-              <TableHeaderCell className="text-right">USD Kuru</TableHeaderCell>
-              <TableHeaderCell className="text-right">Giderler</TableHeaderCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {transactions.sort((a: Transaction, b: Transaction) => new Date(b.date).getTime() - new Date(a.date).getTime()).map((tx: Transaction) => (
-              <TableRow key={tx.id}>
-                <TableCell>{tx.date}</TableCell>
-                <TableCell>
-                  <Badge size="xs" color={tx.transaction_type === 'BUY' ? 'blue' : tx.transaction_type === 'SELL' ? 'amber' : 'purple'}>
-                    {tx.transaction_type === 'BUY' ? 'ALIŞ' : tx.transaction_type === 'SELL' ? 'SATIŞ' : 'TEMETTÜ'}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-right font-bold">{tx.amount.toLocaleString()}</TableCell>
-                <TableCell className="text-right">{tx.price > 0 ? fmt(tx.price) + ' ' + asset.currency : '-'}</TableCell>
-                <TableCell className="text-right text-blue-600 font-medium">{tx.usd_rate ? fmt(tx.usd_rate) : '-'}</TableCell>
-                <TableCell className="text-right text-slate-400">
-                  {tx.tax + tx.commission > 0 ? fmt(tx.tax + tx.commission) : '-'}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </Card>
+      {/* Transactions Table */}
+      <div className="border border-slate-800 rounded-xl overflow-hidden bg-[#0B0F19] text-left text-sm shadow-2xl shadow-black/40">
+        <div className="px-6 py-5 border-b border-slate-800 bg-slate-900/40">
+          <h2 className="text-lg font-semibold text-white tracking-tight">İşlem Geçmişi</h2>
+        </div>
+        <div className="overflow-x-auto custom-scrollbar">
+          <table className="w-full whitespace-nowrap">
+            <thead>
+              <tr className="border-b border-slate-800 text-[10px] font-bold text-slate-500 uppercase tracking-wider bg-slate-900/20">
+                <th className="px-6 py-4 text-left">Tarih</th>
+                <th className="px-6 py-4 text-left">İşlem</th>
+                <th className="px-6 py-4 text-right">Adet/Tutar</th>
+                <th className="px-6 py-4 text-right">Fiyat</th>
+                <th className="px-6 py-4 text-right">USD Kuru</th>
+                <th className="px-6 py-4 text-right">Giderler</th>
+              </tr>
+            </thead>
+            <tbody>
+              {transactions.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="px-6 py-10 text-center text-slate-500 italic">İşlem bulunmamaktadır.</td>
+                </tr>
+              ) : (
+                transactions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).map(tx => {
+                  let badgeStyles = 'bg-slate-500/10 text-slate-400 border-slate-500/20';
+                  let dotBg = 'bg-slate-500';
+                  let label = 'DİĞER';
+                  
+                  if (tx.transaction_type === 'BUY') {
+                    badgeStyles = 'bg-blue-500/10 text-blue-400 border-blue-500/20';
+                    dotBg = 'bg-blue-500';
+                    label = 'ALIŞ';
+                  } else if (tx.transaction_type === 'SELL') {
+                    badgeStyles = 'bg-amber-500/10 text-amber-400 border-amber-500/20';
+                    dotBg = 'bg-amber-500';
+                    label = 'SATIŞ';
+                  } else if (tx.transaction_type === 'DIVIDEND') {
+                    badgeStyles = 'bg-purple-500/10 text-purple-400 border-purple-500/20';
+                    dotBg = 'bg-purple-500';
+                    label = 'TEMETTÜ';
+                  }
+
+                  return (
+                    <tr key={tx.id} className="border-b border-slate-800/60 hover:bg-slate-800/30 transition-colors">
+                      <td className="px-6 py-4 text-slate-300 font-medium">{tx.date}</td>
+                      <td className="px-6 py-4">
+                        <span className={`inline-flex items-center gap-1.5 py-1 px-2.5 rounded-md text-[10px] font-bold tracking-wider border uppercase ${badgeStyles}`}>
+                          <span className={`w-1.5 h-1.5 rounded-full ${dotBg}`}></span>
+                          {label}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-right font-bold text-white">{tx.amount.toLocaleString(undefined, { maximumFractionDigits: 4 })}</td>
+                      <td className="px-6 py-4 text-right text-slate-300">{tx.price > 0 ? <><span className="font-medium text-white">{fmt(tx.price)}</span> <span className="text-[10px] text-slate-500 ml-1">{asset.currency}</span></> : '-'}</td>
+                      <td className="px-6 py-4 text-right text-blue-400 font-medium">{tx.usd_rate ? <><span className="text-[10px] text-blue-400/50 mr-1">$</span>{fmt(tx.usd_rate)}</> : '-'}</td>
+                      <td className="px-6 py-4 text-right text-slate-500 font-medium">{tx.tax + tx.commission > 0 ? fmt(tx.tax + tx.commission) : '-'}</td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 }
