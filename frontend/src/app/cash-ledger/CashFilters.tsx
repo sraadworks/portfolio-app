@@ -19,13 +19,13 @@ export default function CashFilters() {
   };
 
   return (
-    <div className="bg-white/50 backdrop-blur-sm p-4 rounded-xl border border-slate-200 mb-6 flex flex-wrap gap-4 items-end shadow-sm">
+    <div className="flex flex-wrap gap-4 items-end w-full">
       <div className="flex-1 min-w-[140px]">
-        <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1.5 ml-1">Para Birimi</label>
+        <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-2 ml-1">Para Birimi</label>
         <select 
           defaultValue={searchParams.get('currency') || ''}
           onChange={(e) => handleFilterChange('currency', e.target.value)}
-          className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+          className="w-full bg-[#0B0F19] border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
         >
           <option value="">Tümü</option>
           <option value="TRY">TRY (₺)</option>
@@ -34,11 +34,11 @@ export default function CashFilters() {
       </div>
 
       <div className="flex-1 min-w-[140px]">
-        <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1.5 ml-1">İşlem Tipi</label>
+        <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-2 ml-1">İşlem Tipi</label>
         <select 
           defaultValue={searchParams.get('type') || ''}
           onChange={(e) => handleFilterChange('type', e.target.value)}
-          className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+          className="w-full bg-[#0B0F19] border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
         >
           <option value="">Tümü</option>
           <option value="DEPOSIT">Para Yatırma</option>
@@ -50,28 +50,28 @@ export default function CashFilters() {
       </div>
 
       <div className="flex-1 min-w-[140px]">
-        <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1.5 ml-1">Başlangıç Tarihi</label>
+        <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-2 ml-1">Başlangıç Tarihi</label>
         <input 
           type="date"
           defaultValue={searchParams.get('start_date') || ''}
           onChange={(e) => handleFilterChange('start_date', e.target.value)}
-          className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+          className="w-full bg-[#0B0F19] border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all [color-scheme:dark]"
         />
       </div>
 
       <div className="flex-1 min-w-[140px]">
-        <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1.5 ml-1">Bitiş Tarihi</label>
+        <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-2 ml-1">Bitiş Tarihi</label>
         <input 
           type="date"
           defaultValue={searchParams.get('end_date') || ''}
           onChange={(e) => handleFilterChange('end_date', e.target.value)}
-          className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+          className="w-full bg-[#0B0F19] border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all [color-scheme:dark]"
         />
       </div>
 
       <button 
         onClick={() => router.push('/cash-ledger')}
-        className="px-4 py-2 text-sm font-semibold text-slate-500 hover:text-rose-600 transition-colors"
+        className="px-4 py-2 text-sm font-semibold text-slate-400 hover:text-white bg-slate-800/50 hover:bg-slate-700 rounded-lg transition-colors border border-slate-800"
       >
         Temizle
       </button>
