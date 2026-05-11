@@ -53,15 +53,24 @@ export async function createTransaction(formData: FormData) {
   const transaction_type = formData.get('transaction_type') as string;
   const amount = parseFloat(formData.get('amount') as string);
   const price = parseFloat(formData.get('price') as string);
-  const commission = parseFloat(formData.get('commission') as string || '0');
-  const tax = parseFloat(formData.get('tax') as string || '0');
-  
+
   if (isNaN(amount) || amount <= 0 || isNaN(price) || price < 0) {
     return { error: 'Geçerli bir tutar ve fiyat giriniz.' };
   }
 
   const date_input = formData.get('date') as string;
   const date = date_input ? date_input : new Date().toISOString().split('T')[0];
+
+  // Parse optional rate fields — only include if the user explicitly filled them
+  const commissionRaw = formData.get('commission') as string;
+  const taxRaw = formData.get('tax') as string;
+  const riskMarginRaw = formData.get('risk_margin') as string;
+  const usdRateRaw = formData.get('usd_rate') as string;
+
+  const commission = commissionRaw !== null && commissionRaw !== '' ? parseFloat(commissionRaw) : 0;
+  const tax = taxRaw !== null && taxRaw !== '' ? parseFloat(taxRaw) : 0;
+  const risk_margin = riskMarginRaw !== null && riskMarginRaw !== '' ? parseFloat(riskMarginRaw) : 5;
+  const usd_rate = usdRateRaw ? parseFloat(usdRateRaw.replace(',', '.')) : null;
 
   const res = await fetch(`${API_URL}/transactions/`, {
     method: 'POST',
@@ -77,14 +86,18 @@ export async function createTransaction(formData: FormData) {
       exchange_rate: 1.0,
       commission,
       tax,
-      risk_margin: parseFloat(formData.get('risk_margin') as string || '5'),
-      usd_rate: formData.get('usd_rate') ? parseFloat((formData.get('usd_rate') as string).replace(',', '.')) : null
+      risk_margin,
+      usd_rate,
     }),
   });
 
   if (!res.ok) {
-    const err = await res.json();
-    return { error: err.detail || 'İşlem kaydedilemedi.' };
+    try {
+      const err = await res.json();
+      return { error: err.detail || 'İşlem kaydedilemedi.' };
+    } catch {
+      return { error: `Sunucu hatası: ${res.status}` };
+    }
   }
 
   revalidatePath('/assets');

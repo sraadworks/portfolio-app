@@ -189,11 +189,16 @@ def read_assets(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
         buy_txs = [tx for tx in txs if tx.transaction_type == 'BUY']
         sell_txs = [tx for tx in txs if tx.transaction_type == 'SELL']
 
-        tax_rate = buy_txs[-1].tax if buy_txs else 0.0
-        mgmt_fee_rate = buy_txs[-1].commission if buy_txs else 0.0
-        risk_margin_rate = buy_txs[-1].risk_margin if buy_txs else 5.0
-
-        risk_margin_rate = buy_txs[-1].risk_margin if buy_txs else 5.0
+        # Use amount-weighted average rates across all BUY transactions
+        total_buy_amount = sum(tx.amount for tx in buy_txs) if buy_txs else 1.0
+        if buy_txs and total_buy_amount > 0:
+            tax_rate = sum((tx.tax or 0.0) * tx.amount for tx in buy_txs) / total_buy_amount
+            mgmt_fee_rate = sum((tx.commission or 0.0) * tx.amount for tx in buy_txs) / total_buy_amount
+            risk_margin_rate = sum((tx.risk_margin or 5.0) * tx.amount for tx in buy_txs) / total_buy_amount
+        else:
+            tax_rate = 0.0
+            mgmt_fee_rate = 0.0
+            risk_margin_rate = 5.0
 
         # 1. Realized Metrics (Kapanan/Satılan Kısımlar)
         realized_cost = sum(tx.realized_cost for tx in sell_txs)
