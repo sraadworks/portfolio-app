@@ -155,19 +155,26 @@ export async function deleteTransaction(txId: number) {
 }
 
 export async function updateTransaction(txId: number, formData: FormData) {
-  const amount = parseFloat(formData.get('amount') as string);
-  const price = parseFloat(formData.get('price') as string);
-  const commission = parseFloat(formData.get('commission') as string || '0');
-  const tax = parseFloat(formData.get('tax') as string || '0');
-  const risk_margin = parseFloat(formData.get('risk_margin') as string || '5');
+  const amountRaw = formData.get('amount') as string;
+  const priceRaw = formData.get('price') as string;
+  const commissionRaw = formData.get('commission') as string;
+  const taxRaw = formData.get('tax') as string;
+  const risk_marginRaw = formData.get('risk_margin') as string;
   const date = formData.get('date') as string;
+
+  const amount = parseFloat(amountRaw);
+  const price = parseFloat(priceRaw);
+  // Always include these even if 0 — use null fallback only when field is truly absent
+  const commission = commissionRaw !== null && commissionRaw !== '' ? parseFloat(commissionRaw) : undefined;
+  const tax = taxRaw !== null && taxRaw !== '' ? parseFloat(taxRaw) : undefined;
+  const risk_margin = risk_marginRaw !== null && risk_marginRaw !== '' ? parseFloat(risk_marginRaw) : undefined;
 
   const payload: any = {};
   if (!isNaN(amount)) payload.amount = amount;
   if (!isNaN(price)) payload.price = price;
-  if (!isNaN(commission)) payload.commission = commission;
-  if (!isNaN(tax)) payload.tax = tax;
-  if (!isNaN(risk_margin)) payload.risk_margin = risk_margin;
+  if (commission !== undefined && !isNaN(commission)) payload.commission = commission;
+  if (tax !== undefined && !isNaN(tax)) payload.tax = tax;
+  if (risk_margin !== undefined && !isNaN(risk_margin)) payload.risk_margin = risk_margin;
   if (date) payload.date = date;
   
   const usdRateRaw = formData.get('usd_rate') as string;
@@ -181,8 +188,12 @@ export async function updateTransaction(txId: number, formData: FormData) {
   });
 
   if (!res.ok) {
-    const err = await res.json();
-    return { error: err.detail || 'İşlem güncellenemedi.' };
+    try {
+      const err = await res.json();
+      return { error: err.detail || 'İşlem güncellenemedi.' };
+    } catch {
+      return { error: `Sunucu hatası: ${res.status}` };
+    }
   }
 
   revalidatePath('/assets');

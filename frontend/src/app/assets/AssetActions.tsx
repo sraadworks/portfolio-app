@@ -11,6 +11,7 @@ export default function AssetActions({ asset }: { asset: any }) {
   const [showEdit, setShowEdit] = useState(false);
   const [loading, setLoading] = useState(false);
   const [transactions, setTransactions] = useState<any[]>([]);
+  const [txKey, setTxKey] = useState(0); // forces form remount after update
   const router = useRouter();
 
   useEffect(() => {
@@ -39,9 +40,12 @@ export default function AssetActions({ asset }: { asset: any }) {
 
   async function handleTxEdit(txId: number, formData: FormData) {
     setLoading(true);
-    await updateTransaction(txId, formData);
-    const txs = await getAssetTransactions(asset.id);
-    setTransactions(txs);
+    const result = await updateTransaction(txId, formData);
+    if (!result?.error) {
+      const txs = await getAssetTransactions(asset.id);
+      setTransactions(txs);
+      setTxKey(k => k + 1); // remount forms so defaultValue picks up new data
+    }
     setLoading(false);
     router.refresh();
   }
@@ -52,6 +56,7 @@ export default function AssetActions({ asset }: { asset: any }) {
     await deleteTransaction(txId);
     const txs = await getAssetTransactions(asset.id);
     setTransactions(txs);
+    setTxKey(k => k + 1);
     setLoading(false);
     router.refresh();
   }
@@ -189,7 +194,7 @@ export default function AssetActions({ asset }: { asset: any }) {
                       else if (tx.transaction_type === 'DIVIDEND') { badgeStyles = 'bg-blue-500/10 text-blue-400 border-blue-500/20'; dotBg = 'bg-blue-500'; }
 
                       return (
-                        <form key={tx.id} action={(formData) => handleTxEdit(tx.id, formData)} className="flex flex-col gap-3 p-4 border border-slate-800/60 bg-[#0B0F19] rounded-xl shadow-lg relative group hover:border-slate-700 transition-colors">
+                        <form key={`${tx.id}-${txKey}`} action={(formData) => handleTxEdit(tx.id, formData)} className="flex flex-col gap-3 p-4 border border-slate-800/60 bg-[#0B0F19] rounded-xl shadow-lg relative group hover:border-slate-700 transition-colors">
                           
                           <div className="flex justify-between items-center mb-1">
                             <div className="flex items-center gap-3">
