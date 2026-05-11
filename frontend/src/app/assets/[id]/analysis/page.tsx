@@ -62,7 +62,7 @@ function fmt(val: number) {
 export default function AssetAnalysisPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
   const id = resolvedParams.id;
-  
+
   const [asset, setAsset] = useState<Asset | null>(null);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
@@ -95,7 +95,7 @@ export default function AssetAnalysisPage({ params }: { params: Promise<{ id: st
         setLoading(false);
       }
     }
-    
+
     fetchData();
   }, [id]);
 
@@ -143,7 +143,7 @@ export default function AssetAnalysisPage({ params }: { params: Promise<{ id: st
       <div className="flex items-center gap-6">
         <Link href="/assets">
           <button className="flex items-center justify-center w-10 h-10 bg-slate-900/40 border border-slate-800 rounded-xl hover:text-white text-slate-400 hover:bg-slate-800 transition-colors shadow-sm">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
           </button>
         </Link>
         <div>
@@ -159,7 +159,7 @@ export default function AssetAnalysisPage({ params }: { params: Promise<{ id: st
           <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Toplam Maliyet</div>
           <div className="text-2xl font-semibold text-white tracking-tight">{fmt(asset.total_cost)} {asset.currency}</div>
         </div>
-        
+
         <div className="p-6 border border-slate-800/60 rounded-xl bg-[#0B0F19] shadow-2xl shadow-black/40 relative overflow-hidden group hover:border-slate-700/80 transition-colors">
           <div className="absolute top-0 left-0 w-full h-1 bg-emerald-500/50"></div>
           <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Toplam Brüt Kâr</div>
@@ -209,7 +209,7 @@ export default function AssetAnalysisPage({ params }: { params: Promise<{ id: st
               <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold bg-slate-500/10 text-slate-400 border border-slate-500/20 uppercase tracking-wider">Kapalı</span>
             )}
           </div>
-          
+
           {asset.active_quantity > 0 ? (
             <ul className="space-y-3">
               <li className="flex justify-between items-center text-sm">
@@ -233,8 +233,8 @@ export default function AssetAnalysisPage({ params }: { params: Promise<{ id: st
               {/* Profit waterfall */}
               <li className="flex justify-between items-center text-sm">
                 <span className="text-slate-300 font-bold">Aktif Brüt Kâr</span>
-                <span className={`font-black text-xl tracking-tight ${asset.active_gross_profit >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
-                  {asset.active_gross_profit >= 0 ? "+" : ""}{fmt(asset.active_gross_profit)} <span className="text-sm font-normal opacity-50">{asset.currency}</span>
+                <span className={`font-black text-xl tracking-tight ${asset.active_gross_profit >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                  {asset.active_gross_profit >= 0 ? '+' : ''}{fmt(asset.active_gross_profit)} <span className="text-sm font-normal opacity-50">{asset.currency}</span>
                 </span>
               </li>
               {asset.active_commission > 0 && (
@@ -306,7 +306,7 @@ export default function AssetAnalysisPage({ params }: { params: Promise<{ id: st
           <div className="flex justify-between items-center mb-6 pb-4 border-b border-slate-800/60">
             <h2 className="text-lg font-semibold text-white tracking-tight">Kapanan (Gerçekleşen) İşlemler</h2>
           </div>
-          
+
           {asset.realized_revenue > 0 ? (
             <ul className="space-y-3">
               <li className="flex justify-between items-center text-sm">
@@ -319,8 +319,8 @@ export default function AssetAnalysisPage({ params }: { params: Promise<{ id: st
               </li>
               <li className="flex justify-between items-center text-sm">
                 <span className="text-slate-400 font-medium">Gerçekleşen Brüt Kâr</span>
-                <span className={`font-bold ${asset.realized_gross_profit >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
-                  {asset.realized_gross_profit >= 0 ? "+" : ""}{fmt(asset.realized_gross_profit)} <span className="opacity-50 font-normal ml-0.5">{asset.currency}</span>
+                <span className={`font-bold ${asset.realized_gross_profit >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                  {asset.realized_gross_profit >= 0 ? '+' : ''}{fmt(asset.realized_gross_profit)} <span className="opacity-50 font-normal ml-0.5">{asset.currency}</span>
                 </span>
               </li>
               {asset.realized_commission > 0 && (
@@ -400,7 +400,7 @@ export default function AssetAnalysisPage({ params }: { params: Promise<{ id: st
                   let badgeStyles = 'bg-slate-500/10 text-slate-400 border-slate-500/20';
                   let dotBg = 'bg-slate-500';
                   let label = 'DİĞER';
-                  
+
                   if (tx.transaction_type === 'BUY') {
                     badgeStyles = 'bg-blue-500/10 text-blue-400 border-blue-500/20';
                     dotBg = 'bg-blue-500';
