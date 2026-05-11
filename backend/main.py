@@ -18,6 +18,22 @@ try:
     logger.info("Connecting to database and creating tables...")
     models.Base.metadata.create_all(bind=engine)
     logger.info("Database tables created successfully.")
+    
+    # Manual migration for existing databases
+    from sqlalchemy import text
+    with engine.connect() as conn:
+        # Check assets table for portfolio_id
+        try:
+            conn.execute(text("SELECT portfolio_id FROM assets LIMIT 1"))
+        except Exception:
+            logger.info("Migration: Adding portfolio_id column to assets table...")
+            try:
+                conn.execute(text("ALTER TABLE assets ADD COLUMN portfolio_id INTEGER"))
+                # Note: SQLite doesn't support 'REFERENCES' in ALTER TABLE easily, 
+                # but we'll handle foreign keys at the application level if needed.
+                conn.commit()
+            except Exception as e:
+                logger.error(f"Manual migration failed: {e}")
 except Exception as e:
     logger.error(f"Error during database initialization: {e}")
     # Don't exit yet, let's see if FastAPI can at least start
