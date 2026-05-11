@@ -54,7 +54,6 @@ export default function PortfoliosPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* New Portfolio Form */}
-        <div className="flex flex-col gap-8">
           <div className="bg-[#0F172A] border border-slate-800 rounded-xl p-6 h-fit">
             <h2 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">Yeni Portföy Oluştur</h2>
             <form id="portfolio-form" action={handleCreate} className="flex flex-col gap-4">
@@ -69,24 +68,6 @@ export default function PortfoliosPage() {
               </div>
               <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-md text-sm font-medium transition-colors shadow-lg shadow-blue-500/20">Oluştur</button>
             </form>
-          </div>
-
-          <div className="bg-rose-500/5 border border-rose-500/20 rounded-xl p-6">
-            <h3 className="text-xs font-semibold text-rose-400 uppercase tracking-wider mb-2">Sorun Giderme</h3>
-            <p className="text-xs text-slate-500 mb-4">Eğer portföy veya varlık eklerken hata alıyorsanız, veritabanı yapısını güncellemek için sıfırlamanız gerekebilir. (Tüm verileriniz silinecektir!)</p>
-            <button 
-              onClick={async () => {
-                if (!confirm('DİKKAT: Tüm verileriniz kalıcı olarak silinecek. Emin misiniz?')) return;
-                const res = await fetch(`${API_URL}/debug/reset-db`, { method: 'POST' });
-                if (res.ok) {
-                  alert('Veritabanı başarıyla sıfırlandı. Lütfen sayfayı yenileyin.');
-                  window.location.reload();
-                }
-              }}
-              className="w-full bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 py-2 rounded-md text-xs font-medium transition-colors"
-            >
-              Veritabanını Sıfırla
-            </button>
           </div>
         </div>
 

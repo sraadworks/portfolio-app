@@ -53,13 +53,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.post("/debug/reset-db")
-def reset_db(db: Session = Depends(get_db)):
-    # CAUTION: This deletes everything!
-    models.Base.metadata.drop_all(bind=engine)
-    models.Base.metadata.create_all(bind=engine)
-    return {"message": "Database reset successfully"}
-
 @app.get("/")
 def read_root():
     return {"message": "Portfolio MVP API is running"}
