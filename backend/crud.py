@@ -86,6 +86,7 @@ def create_transaction(db: Session, transaction: schemas.TransactionCreate):
             realized_inflation_diff += fraction_cost * (compound_factor - 1.0)
 
             lot.remaining_amount -= sold_from_lot
+            db.add(lot) # Explicitly ensure tracked
             sell_amount -= sold_from_lot
         
         if sell_amount > 0:
@@ -101,7 +102,7 @@ def create_transaction(db: Session, transaction: schemas.TransactionCreate):
         db_cash = models.CashLedger(
             currency=asset.currency,
             transaction_type="SELL",
-            amount=total_cost - transaction.commission - transaction.tax,
+            amount=revenue - transaction.commission - transaction.tax,
             date=transaction.date,
             description=f"Sold {transaction.amount} of {asset.symbol}"
         )

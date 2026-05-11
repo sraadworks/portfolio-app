@@ -203,7 +203,17 @@ def read_assets(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
         # 1. Realized Metrics (Kapanan/Satılan Kısımlar)
         realized_cost = sum(tx.realized_cost for tx in sell_txs)
         realized_revenue = sum(tx.amount * tx.price for tx in sell_txs)
-        realized_inflation_diff = sum(tx.realized_inflation_diff for tx in sell_txs)
+        
+        realized_inflation_diff = 0.0
+        for tx in sell_txs:
+             # Find approximate buy date (oldest lot for now, or improve later)
+             if buy_txs:
+                 oldest_buy = min(buy_txs, key=lambda x: x.date)
+                 compound_factor = calculate_compound_inflation(db, oldest_buy.date, tx.date, asset.currency)
+                 realized_inflation_diff += tx.realized_cost * (compound_factor - 1.0)
+             else:
+                 realized_inflation_diff += tx.realized_inflation_diff # Fallback
+        
         realized_gross_profit = realized_revenue - realized_cost
 
         # Realized commission/tax: use SELL tx's own rate if set, else fall back to BUY weighted avg
