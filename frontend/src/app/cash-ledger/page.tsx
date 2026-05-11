@@ -40,10 +40,10 @@ export default async function CashLedgerPage(props: { searchParams: Promise<any>
   return (
     <div className="flex flex-col h-full max-w-7xl mx-auto w-full">
       {/* Header */}
-      <div className="flex justify-between items-end mb-8">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-8">
         <div>
-          <h1 className="text-2xl font-semibold text-white tracking-tight">Kasa Defteri</h1>
-          <p className="text-sm text-slate-400 mt-1">Nakit akışınızı ve anlık kasa bakiyelerinizi yönetin.</p>
+          <h1 className="text-2xl font-semibold text-[var(--text-primary)] tracking-tight">Kasa Defteri</h1>
+          <p className="text-sm text-slate-500 mt-1">Nakit akışınızı ve anlık kasa bakiyelerinizi yönetin.</p>
         </div>
         <div>
           <CashTransactionForm />
@@ -51,16 +51,16 @@ export default async function CashLedgerPage(props: { searchParams: Promise<any>
       </div>
       
       {/* KPI Grid */}
-      <div className="grid grid-cols-2 gap-6 mb-8">
-        <div className="p-8 border border-slate-800/60 rounded-xl bg-[#0B0F19] shadow-2xl shadow-black/50 hover:bg-slate-800/20 transition-colors relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-1 bg-blue-500/50"></div>
-          <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">TL Kasası</div>
-          <div className="text-4xl font-semibold text-white tracking-tight">₺{cashSummary.TRY.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div className="p-8 border border-[var(--border-main)] rounded-2xl bg-[var(--bg-card)] shadow-xl shadow-black/5 dark:shadow-black/40 hover:bg-[var(--bg-hover)]/30 transition-all relative overflow-hidden group">
+          <div className="absolute top-0 left-0 w-full h-1.5 bg-blue-500/50"></div>
+          <div className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">TL Kasası</div>
+          <div className="text-4xl font-bold text-[var(--text-primary)] tracking-tight">₺{cashSummary.TRY.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
         </div>
-        <div className="p-8 border border-slate-800/60 rounded-xl bg-[#0B0F19] shadow-2xl shadow-black/50 hover:bg-slate-800/20 transition-colors relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-1 bg-emerald-500/50"></div>
-          <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Döviz Kasası (USD)</div>
-          <div className="text-4xl font-semibold text-white tracking-tight">${cashSummary.USD.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+        <div className="p-8 border border-[var(--border-main)] rounded-2xl bg-[var(--bg-card)] shadow-xl shadow-black/5 dark:shadow-black/40 hover:bg-[var(--bg-hover)]/30 transition-all relative overflow-hidden group">
+          <div className="absolute top-0 left-0 w-full h-1.5 bg-emerald-500/50"></div>
+          <div className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Döviz Kasası (USD)</div>
+          <div className="text-4xl font-bold text-[var(--text-primary)] tracking-tight">${cashSummary.USD.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
         </div>
       </div>
 
@@ -70,10 +70,10 @@ export default async function CashLedgerPage(props: { searchParams: Promise<any>
       </div>
 
       {/* Main Table */}
-      <div className="border border-slate-800 rounded-lg overflow-hidden bg-[#0B0F19] text-left text-sm shadow-2xl shadow-black/50">
-        <div className="px-6 py-5 border-b border-slate-800 flex justify-between items-center bg-slate-900/40">
-          <h2 className="text-lg font-semibold text-white tracking-tight">Son İşlemler</h2>
-          <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-slate-800 text-slate-300 border border-slate-700">{total} İşlem</span>
+      <div className="border border-[var(--border-main)] rounded-2xl overflow-hidden bg-[var(--bg-card)] text-left text-sm shadow-xl shadow-black/5 dark:shadow-black/40 transition-colors">
+        <div className="px-6 py-5 border-b border-[var(--border-main)] flex justify-between items-center bg-slate-500/5">
+          <h2 className="text-lg font-semibold text-[var(--text-primary)] tracking-tight">Son İşlemler</h2>
+          <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-slate-500/10 text-slate-500 border border-slate-500/20 uppercase tracking-widest">{total} İşlem</span>
         </div>
         <div className="overflow-x-auto custom-scrollbar">
           <table className="w-full whitespace-nowrap">
@@ -103,8 +103,8 @@ export default async function CashLedgerPage(props: { searchParams: Promise<any>
                   else if (item.transaction_type === 'SELL') { badgeStyles = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'; dotBg = 'bg-emerald-500'; }
 
                   return (
-                    <tr key={item.id} className="border-b border-slate-800 hover:bg-slate-800/30 transition-colors">
-                      <td className="px-6 py-4 text-slate-300">
+                    <tr key={item.id} className="border-b border-[var(--border-main)]/50 last:border-0 hover:bg-[var(--bg-hover)] transition-colors">
+                      <td className="px-6 py-4 text-slate-500">
                         {item.date}
                       </td>
                       <td className="px-6 py-4">
@@ -113,11 +113,11 @@ export default async function CashLedgerPage(props: { searchParams: Promise<any>
                           {item.transaction_type}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-slate-300 truncate max-w-xs">
+                      <td className="px-6 py-4 text-[var(--text-secondary)] truncate max-w-xs">
                         {item.description}
                       </td>
                       <td className="px-6 py-4 text-right">
-                        <div className={`font-semibold ${item.amount >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                        <div className={`font-bold ${item.amount >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
                           {item.amount > 0 ? '+' : ''}{item.amount.toLocaleString(item.currency === 'TRY' ? 'tr-TR' : 'en-US', { style: 'currency', currency: item.currency })}
                         </div>
                       </td>

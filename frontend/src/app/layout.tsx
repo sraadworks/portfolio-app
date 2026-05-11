@@ -26,8 +26,7 @@ export default function RootLayout({
   return (
     <html
       lang="tr"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased bg-[#0B0F19] text-slate-50 dark`}
-      style={{ colorScheme: 'dark' }}
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <ClientLayout>
         {children}

@@ -5,13 +5,33 @@
   --color-foreground: #f8fafc;
 }
 
-/* Force dark mode */
-@custom-variant dark (&:where(.dark, .dark *));
+/* Base styles */
+@layer base {
+  :root {
+    --bg-app: #f8fafc;
+    --bg-card: #ffffff;
+    --bg-sidebar: #f1f5f9;
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --border-main: #e2e8f0;
+    --bg-hover: #f1f5f9;
+  }
 
-body {
-  background-color: var(--color-background);
-  color: var(--color-foreground);
-  font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  .dark {
+    --bg-app: #0B0F19;
+    --bg-card: #0B0F19;
+    --bg-sidebar: #0F172A;
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --border-main: #1e293b;
+    --bg-hover: #1e293b;
+  }
+
+  body {
+    background-color: var(--bg-app);
+    color: var(--text-primary);
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
 }
 
 .custom-scrollbar::-webkit-scrollbar {
@@ -23,10 +43,10 @@ body {
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #e2e8f0;
+  background: #cbd5e1;
   border-radius: 10px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #cbd5e1;
+  background: #94a3b8;
 }

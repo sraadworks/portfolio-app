@@ -83,23 +83,23 @@ export default async function AssetsPage() {
 
       {/* Portfolios Cards */}
       {activeAssets.length === 0 ? (
-        <div className="border border-slate-800 rounded-lg bg-[#0B0F19] p-12 text-center text-slate-500 italic">
+        <div className="border border-[var(--border-main)] rounded-lg bg-[var(--bg-card)] p-12 text-center text-slate-500 italic">
           Henüz aktif bir varlığınız bulunmuyor.
         </div>
       ) : (
         Object.entries(groupedAssets).map(([portfolioName, assets]: [string, any]) => (
-          <div key={portfolioName} className="mb-8 border border-slate-800 rounded-xl overflow-hidden bg-[#0B0F19] text-left text-sm shadow-xl shadow-black/20">
-            <div className="bg-slate-900/40 px-6 py-3 border-b border-slate-800 flex justify-between items-center">
+          <div key={portfolioName} className="mb-8 border border-[var(--border-main)] rounded-xl overflow-hidden bg-[var(--bg-card)] text-left text-sm shadow-xl shadow-black/5 dark:shadow-black/20">
+            <div className="bg-slate-500/5 px-6 py-3 border-b border-[var(--border-main)] flex justify-between items-center">
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></div>
-                <h2 className="text-[11px] font-bold text-blue-400 uppercase tracking-widest">{portfolioName}</h2>
+                <h2 className="text-[11px] font-bold text-blue-500 uppercase tracking-widest">{portfolioName}</h2>
               </div>
-              <span className="text-[10px] font-medium text-slate-500 bg-slate-800/50 px-2 py-0.5 rounded-full">{assets.length} Varlık</span>
+              <span className="text-[10px] font-medium text-slate-500 bg-slate-500/10 px-2 py-0.5 rounded-full">{assets.length} Varlık</span>
             </div>
             <div className="overflow-x-auto custom-scrollbar">
               <table className="w-full whitespace-nowrap">
                 <thead>
-                  <tr className="border-b border-slate-800 text-[10px] font-bold text-slate-500 uppercase tracking-widest bg-slate-900/20">
+                  <tr className="border-b border-[var(--border-main)] text-[10px] font-bold text-slate-500 uppercase tracking-widest bg-slate-500/5">
                     <th className="px-6 py-4 font-semibold text-left">Sembol</th>
                     <th className="px-6 py-4 font-semibold text-left">Tip</th>
                     <th className="px-6 py-4 font-semibold text-right">Adet</th>
@@ -119,9 +119,9 @@ export default async function AssetsPage() {
                     const currentPrice = asset.active_quantity > 0 ? asset.active_value / asset.active_quantity : 0;
                     
                     return (
-                      <tr key={asset.id} className="border-b border-slate-800/50 last:border-0 hover:bg-slate-800/20 transition-colors group">
+                      <tr key={asset.id} className="border-b border-[var(--border-main)]/50 last:border-0 hover:bg-[var(--bg-hover)] transition-colors group">
                         <td className="px-6 py-4">
-                          <div className="font-bold text-white group-hover:text-blue-400 transition-colors">{asset.symbol}</div>
+                          <div className="font-bold text-[var(--text-primary)] group-hover:text-blue-500 transition-colors">{asset.symbol}</div>
                           <div className="text-[10px] text-slate-500">{asset.name}</div>
                         </td>
                         <td className="px-6 py-4">
@@ -129,15 +129,15 @@ export default async function AssetsPage() {
                             {asset.asset_type}
                           </span>
                         </td>
-                        <td className="px-6 py-4 text-right font-semibold text-white">{asset.active_quantity}</td>
-                        <td className="px-6 py-4 text-right text-slate-400">
-                          {avgCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-slate-600 text-[10px]">{asset.currency}</span>
+                        <td className="px-6 py-4 text-right font-semibold text-[var(--text-primary)]">{asset.active_quantity}</td>
+                        <td className="px-6 py-4 text-right text-slate-500">
+                          {avgCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-slate-400 text-[10px]">{asset.currency}</span>
                         </td>
-                        <td className="px-6 py-4 text-right text-white font-bold">
-                          {currentPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-slate-600 text-[10px]">{asset.currency}</span>
+                        <td className="px-6 py-4 text-right text-[var(--text-primary)] font-bold">
+                          {currentPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-slate-400 text-[10px]">{asset.currency}</span>
                         </td>
                         <td className="px-6 py-4 text-right">
-                          <div className="font-bold text-white">${asset.active_usd_value?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                          <div className="font-bold text-[var(--text-primary)]">${asset.active_usd_value?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
                           <div className="text-[9px] text-slate-500 mt-0.5">Maliyet: ${asset.active_usd_cost?.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</div>
                         </td>
                         <td className="px-6 py-4 text-right">

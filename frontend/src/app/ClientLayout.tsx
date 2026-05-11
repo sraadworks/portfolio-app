@@ -6,7 +6,23 @@ import { usePathname } from 'next/navigation';
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   const pathname = usePathname();
+
+  // Handle theme initialization and changes
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme') as 'dark' | 'light' | null;
+    const initialTheme = savedTheme || 'dark';
+    setTheme(initialTheme);
+    document.documentElement.classList.toggle('dark', initialTheme === 'dark');
+  }, []);
+
+  const toggleTheme = () => {
+    const newTheme = theme === 'dark' ? 'light' : 'dark';
+    setTheme(newTheme);
+    localStorage.setItem('theme', newTheme);
+    document.documentElement.classList.toggle('dark', newTheme === 'dark');
+  };
 
   // Close sidebar when route changes on mobile
   useEffect(() => {
@@ -44,7 +60,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   };
 
   return (
-    <body className="min-h-full flex bg-[#0B0F19]">
+    <body className="min-h-full flex bg-[var(--bg-app)] text-[var(--text-primary)] transition-colors duration-300">
       {/* MOBILE OVERLAY */}
       {isSidebarOpen && (
         <div 
@@ -55,7 +71,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
 
       {/* SIDEBAR */}
       <aside className={`
-        fixed inset-y-0 left-0 z-50 w-64 bg-[#0B0F19] border-r border-slate-800/60 flex flex-col p-4 transition-transform duration-300 ease-in-out
+        fixed inset-y-0 left-0 z-50 w-64 bg-[var(--bg-sidebar)] border-r border-[var(--border-main)] flex flex-col p-4 transition-all duration-300 ease-in-out
         ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
         md:relative md:translate-x-0 md:flex
       `}>
@@ -64,11 +80,11 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
             <div className="w-8 h-8 rounded-md bg-gradient-to-tr from-blue-600 to-blue-400 flex items-center justify-center font-bold text-white shadow-lg shadow-blue-500/20">
               P
             </div>
-            <span className="font-semibold text-lg tracking-tight text-white">Portfolio MVP</span>
+            <span className="font-semibold text-lg tracking-tight text-[var(--text-primary)]">Portfolio MVP</span>
           </div>
           <button 
             onClick={() => setIsSidebarOpen(false)}
-            className="p-2 text-slate-500 hover:text-white md:hidden"
+            className="p-2 text-slate-500 hover:text-[var(--text-primary)] md:hidden"
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
           </button>
@@ -85,8 +101,8 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
               href={item.href} 
               className={`px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-3 ${
                 pathname === item.href 
-                ? 'bg-blue-600/10 text-blue-400 border border-blue-600/20' 
-                : 'text-slate-300 hover:bg-slate-800/50 hover:text-white'
+                ? 'bg-blue-600/10 text-blue-500 border border-blue-600/20' 
+                : 'text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)]'
               }`}
             >
               <span className={pathname === item.href ? 'text-blue-500' : 'text-slate-400'}>{item.icon}</span>
@@ -105,8 +121,8 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
               href={item.href} 
               className={`px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-3 ${
                 pathname === item.href 
-                ? 'bg-blue-600/10 text-blue-400 border border-blue-600/20' 
-                : 'text-slate-300 hover:bg-slate-800/50 hover:text-white'
+                ? 'bg-blue-600/10 text-blue-500 border border-blue-600/20' 
+                : 'text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)]'
               }`}
             >
               <span className={pathname === item.href ? 'text-blue-500' : 'text-slate-400'}>{item.icon}</span>
@@ -115,25 +131,43 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
           ))}
         </nav>
 
-        <div className="mt-auto pt-6 border-t border-slate-800/60">
-          <div className="flex items-center gap-3 px-2 py-2 rounded-md hover:bg-slate-800/30 cursor-pointer transition-colors">
-            <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-xs font-bold text-slate-300">
+        <div className="mt-auto pt-6 border-t border-[var(--border-main)]">
+          {/* THEME TOGGLE */}
+          <button 
+            onClick={toggleTheme}
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-[var(--bg-hover)] transition-all group mb-4 border border-transparent hover:border-[var(--border-main)]"
+          >
+            <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-500 group-hover:scale-110 transition-transform">
+              {theme === 'dark' ? (
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 5a7 7 0 100 14 7 7 0 000-14z" /></svg>
+              ) : (
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
+              )}
+            </div>
+            <div className="flex flex-col items-start">
+              <span className="text-xs font-bold text-[var(--text-primary)]">{theme === 'dark' ? 'Aydınlık Mod' : 'Karanlık Mod'}</span>
+              <span className="text-[10px] text-slate-500">Görünümü değiştir</span>
+            </div>
+          </button>
+
+          <div className="flex items-center gap-3 px-2 py-2 rounded-md hover:bg-[var(--bg-hover)] cursor-pointer transition-colors">
+            <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-xs font-bold text-slate-500">
               SM
             </div>
             <div className="flex-1">
-              <div className="text-sm font-medium text-white">Sra Media</div>
+              <div className="text-sm font-medium text-[var(--text-primary)]">Sra Media</div>
             </div>
           </div>
         </div>
       </aside>
 
       {/* MAIN CONTENT */}
-      <main className="flex-1 flex flex-col relative z-10 overflow-hidden w-full">
+      <main className="flex-1 flex flex-col relative z-10 overflow-hidden w-full bg-[var(--bg-app)]">
         {/* HEADER */}
-        <header className="h-14 border-b border-slate-800/60 flex items-center px-4 md:px-8 shrink-0 gap-3 bg-[#0B0F19]/80 backdrop-blur-md sticky top-0 z-30">
+        <header className="h-14 border-b border-[var(--border-main)] flex items-center px-4 md:px-8 shrink-0 gap-3 bg-[var(--bg-app)]/80 backdrop-blur-md sticky top-0 z-30 transition-colors duration-300">
           <button 
             onClick={() => setIsSidebarOpen(true)}
-            className="p-2 -ml-2 text-slate-400 hover:text-white md:hidden"
+            className="p-2 -ml-2 text-slate-400 hover:text-[var(--text-primary)] md:hidden"
           >
             <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" /></svg>
           </button>
@@ -143,7 +177,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
             <span className="text-sm font-medium text-slate-400">Home</span>
             <svg className="w-3 h-3 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
           </div>
-          <span className="text-sm font-semibold text-white truncate">{getPageTitle()}</span>
+          <span className="text-sm font-semibold text-[var(--text-primary)] truncate">{getPageTitle()}</span>
         </header>
         
         <div className="flex-1 overflow-auto p-4 md:p-8 custom-scrollbar">
