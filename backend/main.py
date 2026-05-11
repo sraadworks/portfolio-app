@@ -20,8 +20,7 @@ try:
     logger.info("Database tables created successfully.")
     
     # Manual migration for existing databases
-    from sqlalchemy import text
-    with engine.connect() as conn:
+    with engine.begin() as conn:
         # Check assets table for portfolio_id
         try:
             conn.execute(text("SELECT portfolio_id FROM assets LIMIT 1"))
@@ -29,9 +28,6 @@ try:
             logger.info("Migration: Adding portfolio_id column to assets table...")
             try:
                 conn.execute(text("ALTER TABLE assets ADD COLUMN portfolio_id INTEGER"))
-                # Note: SQLite doesn't support 'REFERENCES' in ALTER TABLE easily, 
-                # but we'll handle foreign keys at the application level if needed.
-                conn.commit()
             except Exception as e:
                 logger.error(f"Manual migration failed: {e}")
 except Exception as e:
@@ -374,7 +370,7 @@ def read_assets(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
             total_risk_margin_profit=total_risk_margin_profit,
             
             risk_margin_rate=risk_margin_rate,
-            portfolio_name=asset.portfolio.name if asset.portfolio else None
+            portfolio_name=getattr(asset.portfolio, 'name', None) if hasattr(asset, 'portfolio') else None
         ))
         
     return performances
