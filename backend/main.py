@@ -178,7 +178,7 @@ def create_benchmark_data(data: schemas.BenchmarkDataCreate, db: Session = Depen
 def read_assets(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     assets = crud.get_assets(db, skip=skip, limit=limit)
     from services.data_fetcher import get_asset_price
-    from services.finance import calculate_inflation_difference
+    from services.finance import calculate_inflation_difference, calculate_compound_inflation
     from models import Transaction
     
     performances = []
