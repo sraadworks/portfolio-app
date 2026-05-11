@@ -53,25 +53,24 @@ export default function PortfoliosPage() {
       <p className="text-sm text-slate-400 mb-8">Varlıklarınızı mantıksal gruplara ayırarak daha düzenli takip edin.</p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* New Portfolio Form */}
-          <div className="bg-[#0F172A] border border-slate-800 rounded-xl p-6 h-fit">
-            <h2 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">Yeni Portföy Oluştur</h2>
-            <form id="portfolio-form" action={handleCreate} className="flex flex-col gap-4">
-              {error && <div className="text-xs text-rose-400 bg-rose-400/10 border border-rose-400/20 p-2 rounded">{error}</div>}
-              <div>
-                <label className="block text-xs text-slate-400 mb-1.5 font-medium">Portföy Adı</label>
-                <input required name="name" type="text" placeholder="Örn: BIST Yan Tahta" className="w-full bg-[#0B0F19] border border-slate-800 rounded-md px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500 transition-all" />
-              </div>
-              <div>
-                <label className="block text-xs text-slate-400 mb-1.5 font-medium">Açıklama (Opsiyonel)</label>
-                <textarea name="description" rows={3} placeholder="Bu portföyün amacı..." className="w-full bg-[#0B0F19] border border-slate-800 rounded-md px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500 transition-all" />
-              </div>
-              <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-md text-sm font-medium transition-colors shadow-lg shadow-blue-500/20">Oluştur</button>
-            </form>
-          </div>
+        {/* Column 1: New Portfolio Form */}
+        <div className="bg-[#0F172A] border border-slate-800 rounded-xl p-6 h-fit">
+          <h2 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">Yeni Portföy Oluştur</h2>
+          <form id="portfolio-form" action={handleCreate} className="flex flex-col gap-4">
+            {error && <div className="text-xs text-rose-400 bg-rose-400/10 border border-rose-400/20 p-2 rounded">{error}</div>}
+            <div>
+              <label className="block text-xs text-slate-400 mb-1.5 font-medium">Portföy Adı</label>
+              <input required name="name" type="text" placeholder="Örn: BIST Yan Tahta" className="w-full bg-[#0B0F19] border border-slate-800 rounded-md px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500 transition-all" />
+            </div>
+            <div>
+              <label className="block text-xs text-slate-400 mb-1.5 font-medium">Açıklama (Opsiyonel)</label>
+              <textarea name="description" rows={3} placeholder="Bu portföyün amacı..." className="w-full bg-[#0B0F19] border border-slate-800 rounded-md px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500 transition-all" />
+            </div>
+            <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-md text-sm font-medium transition-colors shadow-lg shadow-blue-500/20">Oluştur</button>
+          </form>
         </div>
 
-        {/* Portfolio List */}
+        {/* Column 2: Portfolio List */}
         <div className="flex flex-col gap-4">
           <h2 className="text-sm font-semibold text-white uppercase tracking-wider mb-2">Mevcut Portföyler</h2>
           {isLoading ? (
