@@ -19,12 +19,16 @@ interface Asset {
   active_inflation_diff: number;
   active_real_net_profit: number;
   active_risk_margin_profit: number;
+  active_usd_cost: number;
+  active_usd_value: number;
   active_usd_profit: number;
   active_usd_percent: number;
   risk_margin_rate: number;
   total_cost: number;
   total_gross_profit: number;
+  total_net_profit: number;
   total_real_net_profit: number;
+  total_risk_margin_profit: number;
   realized_revenue: number;
   realized_cost: number;
   realized_holding_days: number;
