@@ -81,104 +81,120 @@ export default async function AssetsPage() {
         </div>
       </div>
 
-      {/* Main Table */}
-      <div className="border border-slate-800 rounded-lg overflow-hidden bg-[#0B0F19] text-left text-sm shadow-2xl shadow-black/50">
+      {/* Portfolios Cards */}
+      {activeAssets.length === 0 ? (
+        <div className="border border-slate-800 rounded-lg bg-[#0B0F19] p-12 text-center text-slate-500 italic">
+          Henüz aktif bir varlığınız bulunmuyor.
+        </div>
+      ) : (
+        Object.entries(groupedAssets).map(([portfolioName, assets]: [string, any]) => (
+          <div key={portfolioName} className="mb-8 border border-slate-800 rounded-xl overflow-hidden bg-[#0B0F19] text-left text-sm shadow-xl shadow-black/20">
+            <div className="bg-slate-900/40 px-6 py-3 border-b border-slate-800 flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></div>
+                <h2 className="text-[11px] font-bold text-blue-400 uppercase tracking-widest">{portfolioName}</h2>
+              </div>
+              <span className="text-[10px] font-medium text-slate-500 bg-slate-800/50 px-2 py-0.5 rounded-full">{assets.length} Varlık</span>
+            </div>
+            <div className="overflow-x-auto custom-scrollbar">
+              <table className="w-full whitespace-nowrap">
+                <thead>
+                  <tr className="border-b border-slate-800 text-[10px] font-bold text-slate-500 uppercase tracking-widest bg-slate-900/20">
+                    <th className="px-6 py-4 font-semibold text-left">Sembol</th>
+                    <th className="px-6 py-4 font-semibold text-left">Tip</th>
+                    <th className="px-6 py-4 font-semibold text-right">Adet</th>
+                    <th className="px-6 py-4 font-semibold text-right">Ort. Maliyet</th>
+                    <th className="px-6 py-4 font-semibold text-right">Fiyat</th>
+                    <th className="px-6 py-4 font-semibold text-right">USD Değer</th>
+                    <th className="px-6 py-4 font-semibold text-right">USD Getiri</th>
+                    <th className="px-6 py-4 font-semibold text-right">Reel Net Kâr</th>
+                    <th className="px-6 py-4 font-semibold text-center">Durum</th>
+                    <th className="px-6 py-4 font-semibold text-center">İşlem</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {assets.map((asset: any) => {
+                    const avgCost = asset.active_quantity > 0 ? asset.active_cost / asset.active_quantity : 0;
+                    const isUSDProfit = asset.active_usd_profit >= 0;
+                    const currentPrice = asset.active_quantity > 0 ? asset.active_value / asset.active_quantity : 0;
+                    
+                    return (
+                      <tr key={asset.id} className="border-b border-slate-800/50 last:border-0 hover:bg-slate-800/20 transition-colors group">
+                        <td className="px-6 py-4">
+                          <div className="font-bold text-white group-hover:text-blue-400 transition-colors">{asset.symbol}</div>
+                          <div className="text-[10px] text-slate-500">{asset.name}</div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className="inline-flex items-center gap-1.5 py-0.5 px-2 rounded-full text-[9px] font-bold tracking-wider bg-slate-800/50 text-slate-400 border border-slate-700/50 uppercase">
+                            {asset.asset_type}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-right font-semibold text-white">{asset.active_quantity}</td>
+                        <td className="px-6 py-4 text-right text-slate-400">
+                          {avgCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-slate-600 text-[10px]">{asset.currency}</span>
+                        </td>
+                        <td className="px-6 py-4 text-right text-white font-bold">
+                          {currentPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-slate-600 text-[10px]">{asset.currency}</span>
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          <div className="font-bold text-white">${asset.active_usd_value?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                          <div className="text-[9px] text-slate-500 mt-0.5">Maliyet: ${asset.active_usd_cost?.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</div>
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          <div className={`font-bold ${isUSDProfit ? 'text-emerald-400' : 'text-rose-400'}`}>
+                            {isUSDProfit ? '+' : ''}${asset.active_usd_profit?.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                          </div>
+                          <div className={`text-[9px] mt-0.5 font-bold ${isUSDProfit ? 'text-emerald-500/70' : 'text-rose-500/70'}`}>
+                            {isUSDProfit ? '▲' : '▼'} %{asset.active_usd_percent?.toFixed(2)}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          <div className={`font-bold ${asset.active_real_net_profit >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                            {asset.active_real_net_profit >= 0 ? '+' : ''}₺{asset.active_real_net_profit.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-center">
+                          <Link href={`/assets/${asset.id}/analysis`} className="inline-flex items-center gap-1.5 py-0.5 px-2.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 transition-colors">
+                            Açık
+                          </Link>
+                        </td>
+                        <td className="px-6 py-4 text-center">
+                          <AssetActions asset={asset} portfolios={portfolios} />
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        ))
+      )}
+
+      {/* Closed Assets Card */}
+      <div className="border border-slate-800 rounded-xl overflow-hidden bg-[#0B0F19] text-left text-sm shadow-xl shadow-black/20 opacity-80">
+        <div className="bg-slate-900/20 px-6 py-3 border-b border-slate-800 flex justify-between items-center">
+          <h2 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Kapanan Pozisyonlar</h2>
+          <span className="text-[10px] font-medium text-slate-600 bg-slate-800/30 px-2 py-0.5 rounded-full">{closedAssets.length}</span>
+        </div>
         <div className="overflow-x-auto custom-scrollbar">
           <table className="w-full whitespace-nowrap">
             <thead>
-              <tr className="border-b border-slate-800 text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                <th className="px-6 py-4 font-medium text-left">Sembol</th>
-                <th className="px-6 py-4 font-medium text-left">Tip</th>
-                <th className="px-6 py-4 font-medium text-right">Adet</th>
-                <th className="px-6 py-4 font-medium text-right">Ort. Maliyet</th>
-                <th className="px-6 py-4 font-medium text-right">Fiyat</th>
-                <th className="px-6 py-4 font-medium text-right">USD Değer</th>
-                <th className="px-6 py-4 font-medium text-right">USD Getiri</th>
-                <th className="px-6 py-4 font-medium text-right">Reel Net Kâr</th>
-                <th className="px-6 py-4 font-medium text-center">Durum</th>
-                <th className="px-6 py-4 font-medium text-center">İşlem</th>
+              <tr className="border-b border-slate-800 text-[10px] font-bold text-slate-600 uppercase tracking-widest bg-slate-900/10">
+                <th className="px-6 py-4 font-semibold text-left">Sembol</th>
+                <th className="px-6 py-4 font-semibold text-left">Tip</th>
+                <th className="px-6 py-4 font-semibold text-right">Maliyet</th>
+                <th className="px-6 py-4 font-semibold text-right">Satış</th>
+                <th className="px-6 py-4 font-semibold text-right">Net Kâr (Birim)</th>
+                <th className="px-6 py-4 font-semibold text-right">Reel Net Kâr</th>
+                <th className="px-6 py-4 font-semibold text-center">Durum</th>
+                <th className="px-6 py-4 font-semibold text-center">İşlem</th>
               </tr>
             </thead>
             <tbody>
-              {activeAssets.length === 0 ? (
-                <tr>
-                  <td colSpan={10} className="px-6 py-8 text-center text-slate-500 italic">Henüz aktif bir varlığınız bulunmuyor.</td>
-                </tr>
-              ) : (
-                Object.entries(groupedAssets).map(([portfolioName, assets]: [string, any]) => (
-                  <>
-                    <tr className="bg-slate-900/20 border-b border-slate-800/50">
-                      <td colSpan={10} className="px-6 py-2 text-[10px] font-bold text-blue-400 uppercase tracking-widest">
-                        {portfolioName}
-                      </td>
-                    </tr>
-                    {assets.map((asset: any) => {
-                      const avgCost = asset.active_quantity > 0 ? asset.active_cost / asset.active_quantity : 0;
-                      const isUSDProfit = asset.active_usd_profit >= 0;
-                      const currentPrice = asset.active_quantity > 0 ? asset.active_value / asset.active_quantity : 0;
-                      
-                      return (
-                        <tr key={asset.id} className="border-b border-slate-800 hover:bg-slate-800/30 transition-colors">
-                          <td className="px-6 py-4">
-                            <div className="font-semibold text-white">{asset.symbol}</div>
-                            <div className="text-xs text-slate-500">{asset.name}</div>
-                          </td>
-                          <td className="px-6 py-4">
-                            <span className="inline-flex items-center gap-1.5 py-1 px-2.5 rounded-full text-[10px] font-semibold tracking-wide bg-slate-800/50 text-slate-300 border border-slate-700/50 uppercase">
-                              <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
-                              {asset.asset_type}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 text-right font-medium text-white">{asset.active_quantity}</td>
-                          <td className="px-6 py-4 text-right text-slate-300">
-                            {avgCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-slate-500 text-xs">{asset.currency}</span>
-                          </td>
-                          <td className="px-6 py-4 text-right text-white font-medium">
-                            {currentPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-slate-500 text-xs">{asset.currency}</span>
-                          </td>
-                          <td className="px-6 py-4 text-right">
-                            <div className="font-semibold text-white">${asset.active_usd_value?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-                            <div className="text-[10px] text-slate-500 mt-0.5">Maliyet: ${asset.active_usd_cost?.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</div>
-                          </td>
-                          <td className="px-6 py-4 text-right">
-                            <div className={`font-semibold ${isUSDProfit ? 'text-emerald-400' : 'text-rose-400'}`}>
-                              {isUSDProfit ? '+' : ''}${asset.active_usd_profit?.toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                            </div>
-                            <div className={`text-[10px] mt-0.5 font-medium ${isUSDProfit ? 'text-emerald-500/70' : 'text-rose-500/70'}`}>
-                              {isUSDProfit ? '▲' : '▼'} %{asset.active_usd_percent?.toFixed(2)}
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 text-right">
-                            <div className={`font-semibold ${asset.active_real_net_profit >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
-                              {asset.active_real_net_profit >= 0 ? '+' : ''}₺{asset.active_real_net_profit.toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 text-center">
-                            <Link href={`/assets/${asset.id}/analysis`} className="inline-flex items-center gap-1.5 py-1 px-3 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 transition-colors">
-                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                              Açık
-                            </Link>
-                          </td>
-                          <td className="px-6 py-4 text-center">
-                            <AssetActions asset={asset} portfolios={portfolios} />
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </>
-                ))
-              )}
-
-              {/* GROUP: CLOSED */}
-              <tr className="bg-slate-900/40 border-b border-slate-800">
-                <td colSpan={10} className="px-6 py-2.5 text-xs font-semibold text-slate-300">
-                  Kapanan Pozisyonlar <span className="ml-2 px-1.5 py-0.5 rounded-full bg-slate-800 text-slate-400">{closedAssets.length}</span>
-                </td>
-              </tr>
-              
               {closedAssets.length === 0 ? (
                 <tr>
-                  <td colSpan={10} className="px-6 py-8 text-center text-slate-500 italic">Kapanmış bir pozisyonunuz bulunmuyor.</td>
+                  <td colSpan={8} className="px-6 py-8 text-center text-slate-600 italic">Kapanmış bir pozisyonunuz bulunmuyor.</td>
                 </tr>
               ) : (
                 closedAssets.map((asset: any) => {
@@ -187,43 +203,37 @@ export default async function AssetsPage() {
                   const percent = asset.total_cost > 0 ? (asset.total_gross_profit / asset.total_cost) * 100 : 0;
                   
                   return (
-                    <tr key={asset.id} className="border-b border-slate-800 hover:bg-slate-800/30 transition-colors">
+                    <tr key={asset.id} className="border-b border-slate-800/50 last:border-0 hover:bg-slate-800/20 transition-colors group">
                       <td className="px-6 py-4">
-                        <div className="font-semibold text-slate-400">{asset.symbol}</div>
-                        <div className="text-xs text-slate-600">{asset.name}</div>
+                        <div className="font-bold text-slate-400 group-hover:text-slate-300 transition-colors">{asset.symbol}</div>
+                        <div className="text-[9px] text-slate-600">{asset.name}</div>
                       </td>
                       <td className="px-6 py-4">
-                        <span className="inline-flex items-center gap-1.5 py-1 px-2.5 rounded-full text-[10px] font-semibold tracking-wide bg-slate-800/30 text-slate-400 border border-slate-700/30 uppercase">
-                          <span className="w-1.5 h-1.5 rounded-full bg-slate-500"></span>
+                        <span className="inline-flex items-center gap-1.5 py-0.5 px-2 rounded-full text-[9px] font-bold tracking-wider bg-slate-800/30 text-slate-500 border border-slate-700/30 uppercase">
                           {asset.asset_type}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-right font-medium text-slate-500">0</td>
-                      <td className="px-6 py-4 text-right text-slate-400">
-                        {asset.total_cost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-slate-600 text-xs">{asset.currency}</span>
-                      </td>
-                      <td className="px-6 py-4 text-right text-slate-400 font-medium">
-                        {(asset.total_cost + asset.total_gross_profit).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-slate-600 text-xs">{asset.currency}</span>
-                      </td>
                       <td className="px-6 py-4 text-right text-slate-500">
-                        -
+                        {asset.total_cost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-slate-600 text-[9px]">{asset.currency}</span>
+                      </td>
+                      <td className="px-6 py-4 text-right text-slate-500 font-bold">
+                        {(asset.total_cost + asset.total_gross_profit).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-slate-600 text-[9px]">{asset.currency}</span>
                       </td>
                       <td className="px-6 py-4 text-right">
-                        <div className={`font-semibold ${isProfit ? 'text-emerald-500' : 'text-rose-500'}`}>
-                          {isProfit ? '+' : ''}{asset.total_gross_profit.toLocaleString(undefined, { maximumFractionDigits: 0 })} <span className="text-xs">{asset.currency}</span>
+                        <div className={`font-bold ${isProfit ? 'text-emerald-600' : 'text-rose-600'}`}>
+                          {isProfit ? '+' : ''}{asset.total_gross_profit.toLocaleString(undefined, { maximumFractionDigits: 0 })} <span className="text-[9px]">{asset.currency}</span>
                         </div>
-                        <div className={`text-[10px] mt-0.5 font-medium ${isProfit ? 'text-emerald-600/70' : 'text-rose-600/70'}`}>
+                        <div className={`text-[9px] mt-0.5 font-bold ${isProfit ? 'text-emerald-700/70' : 'text-rose-700/70'}`}>
                           {isProfit ? '▲' : '▼'} %{percent.toFixed(2)}
                         </div>
                       </td>
                       <td className="px-6 py-4 text-right">
-                        <div className={`font-semibold ${isRealProfit ? 'text-emerald-500' : 'text-rose-500'}`}>
+                        <div className={`font-bold ${isRealProfit ? 'text-emerald-600' : 'text-rose-600'}`}>
                           {isRealProfit ? '+' : ''}₺{asset.total_real_net_profit.toLocaleString(undefined, { maximumFractionDigits: 0 })}
                         </div>
                       </td>
                       <td className="px-6 py-4 text-center">
-                        <Link href={`/assets/${asset.id}/analysis`} className="inline-flex items-center gap-1.5 py-1 px-3 rounded-full text-xs font-medium bg-slate-800/50 text-slate-400 border border-slate-700/50 hover:bg-slate-700 transition-colors">
-                          <span className="w-1.5 h-1.5 rounded-full bg-slate-500"></span>
+                        <Link href={`/assets/${asset.id}/analysis`} className="inline-flex items-center gap-1.5 py-0.5 px-2.5 rounded-full text-[10px] font-bold bg-slate-800/50 text-slate-500 border border-slate-700/50 hover:bg-slate-700 transition-colors">
                           Kapalı
                         </Link>
                       </td>
