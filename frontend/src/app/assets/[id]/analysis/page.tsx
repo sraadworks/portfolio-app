@@ -167,10 +167,18 @@ export default function AssetAnalysisPage({ params }: { params: Promise<{ id: st
 
         <div className="p-6 border border-slate-800/60 rounded-xl bg-[#0B0F19] shadow-2xl shadow-black/40 relative overflow-hidden group hover:border-slate-700/80 transition-colors">
           <div className="absolute top-0 left-0 w-full h-1 bg-slate-500/50"></div>
-          <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Reel Net Kâr <span className="normal-case font-normal text-slate-500">(Enflasyon Arındırılmış)</span></div>
+          <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Reel Net Kâr <span className="normal-case font-normal text-slate-500">(Enflasyon Arındırılmış)</span></div>
+          <div className="text-[10px] text-slate-600 mb-3">Komisyon + Stopaj + Enflasyon düşüldü</div>
           <div className={`text-2xl font-semibold tracking-tight ${asset.total_real_net_profit >= 0 ? 'text-white' : 'text-rose-400'}`}>
             {asset.total_real_net_profit >= 0 ? "+" : ""}{fmt(asset.total_real_net_profit)}
           </div>
+          {asset.risk_margin_rate > 0 && (
+            <div className="mt-2 text-[10px] text-slate-600">
+              Arındırma sonrası: <span className={asset.total_risk_margin_profit >= 0 ? 'text-slate-400' : 'text-rose-500'}>
+                {asset.total_risk_margin_profit >= 0 ? '+' : ''}{fmt(asset.total_risk_margin_profit)}
+              </span> <span className="text-slate-700">(Bağış/Risk %{asset.risk_margin_rate.toFixed(1)} düşüldü)</span>
+            </div>
+          )}
         </div>
 
         <div className="p-6 border border-slate-800/60 rounded-xl bg-[#0B0F19] shadow-2xl shadow-black/40 relative overflow-hidden group hover:border-slate-700/80 transition-colors">
@@ -195,7 +203,7 @@ export default function AssetAnalysisPage({ params }: { params: Promise<{ id: st
           </div>
           
           {asset.active_quantity > 0 ? (
-            <ul className="space-y-4">
+            <ul className="space-y-3">
               <li className="flex justify-between items-center text-sm">
                 <span className="text-slate-400 font-medium">Kalan Adet</span>
                 <span className="font-semibold text-white">{asset.active_quantity}</span>
@@ -212,20 +220,52 @@ export default function AssetAnalysisPage({ params }: { params: Promise<{ id: st
                 <span className="text-slate-400 font-medium">Elde Tutma Süresi</span>
                 <span className="font-semibold text-white">{asset.active_holding_days} Gün</span>
               </li>
-              <div className="h-px bg-slate-800/60 my-5"></div>
+              <div className="h-px bg-slate-800/60 my-4"></div>
+
+              {/* Profit waterfall */}
               <li className="flex justify-between items-center text-sm">
                 <span className="text-slate-300 font-bold">Aktif Brüt Kâr</span>
                 <span className={`font-black text-xl tracking-tight ${asset.active_gross_profit >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
                   {asset.active_gross_profit >= 0 ? "+" : ""}{fmt(asset.active_gross_profit)} <span className="text-sm font-normal opacity-50">{asset.currency}</span>
                 </span>
               </li>
+              {asset.active_net_profit !== asset.active_gross_profit && (
+                <li className="flex justify-between items-center text-sm">
+                  <span className="text-slate-500 font-medium">- Yönetim + Stopaj</span>
+                  <span className="font-medium text-rose-500/80">
+                    -{fmt(asset.active_gross_profit - asset.active_net_profit)} <span className="text-xs opacity-60">{asset.currency}</span>
+                  </span>
+                </li>
+              )}
               <li className="flex justify-between items-center text-sm">
-                <span className="text-slate-400 font-medium">Enflasyon Kaybı</span>
-                <span className="font-semibold text-amber-500">-{fmt(asset.active_inflation_diff)} <span className="text-amber-500/50 font-normal ml-0.5">{asset.currency}</span></span>
+                <span className="text-slate-500 font-medium">- Enflasyon Kaybı</span>
+                <span className="font-medium text-amber-500/80">-{fmt(asset.active_inflation_diff)} <span className="text-xs opacity-60">{asset.currency}</span></span>
               </li>
-              
+              <li className="flex justify-between items-center text-sm border-t border-slate-800/60 pt-3 mt-1">
+                <span className="text-slate-300 font-semibold">Reel Net Kâr</span>
+                <span className={`font-bold text-lg ${asset.active_real_net_profit >= 0 ? 'text-white' : 'text-rose-400'}`}>
+                  {asset.active_real_net_profit >= 0 ? '+' : ''}{fmt(asset.active_real_net_profit)} <span className="text-sm font-normal opacity-50">{asset.currency}</span>
+                </span>
+              </li>
+              {asset.risk_margin_rate > 0 && (
+                <>
+                  <li className="flex justify-between items-center text-sm">
+                    <span className="text-slate-500 font-medium">- Bağış / Risk Arındırma (%{asset.risk_margin_rate.toFixed(1)})</span>
+                    <span className="font-medium text-slate-500">
+                      -{fmt(asset.active_real_net_profit - asset.active_risk_margin_profit)} <span className="text-xs opacity-60">{asset.currency}</span>
+                    </span>
+                  </li>
+                  <li className="flex justify-between items-center text-sm border-t border-slate-800/60 pt-3">
+                    <span className="text-white font-bold">Nihai Net Kâr</span>
+                    <span className={`font-black text-xl tracking-tight ${asset.active_risk_margin_profit >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                      {asset.active_risk_margin_profit >= 0 ? '+' : ''}{fmt(asset.active_risk_margin_profit)} <span className="text-sm font-normal opacity-50">{asset.currency}</span>
+                    </span>
+                  </li>
+                </>
+              )}
+
               {asset.currency === 'TRY' && (
-                <div className="mt-6 p-4 bg-blue-500/5 border border-blue-500/20 rounded-xl relative overflow-hidden">
+                <div className="mt-4 p-4 bg-blue-500/5 border border-blue-500/20 rounded-xl relative overflow-hidden">
                   <div className="absolute top-0 left-0 w-1 h-full bg-blue-500/50"></div>
                   <div className="flex justify-between items-center pl-2">
                     <div>
@@ -252,7 +292,7 @@ export default function AssetAnalysisPage({ params }: { params: Promise<{ id: st
           </div>
           
           {asset.realized_revenue > 0 ? (
-            <ul className="space-y-4">
+            <ul className="space-y-3">
               <li className="flex justify-between items-center text-sm">
                 <span className="text-slate-400 font-medium">Satış Geliri</span>
                 <span className="font-semibold text-white">{fmt(asset.realized_revenue)} <span className="text-slate-500 font-normal ml-0.5">{asset.currency}</span></span>
@@ -267,17 +307,41 @@ export default function AssetAnalysisPage({ params }: { params: Promise<{ id: st
                   {asset.realized_gross_profit >= 0 ? "+" : ""}{fmt(asset.realized_gross_profit)} <span className="opacity-50 font-normal ml-0.5">{asset.currency}</span>
                 </span>
               </li>
+              {asset.realized_net_profit !== asset.realized_gross_profit && (
+                <li className="flex justify-between items-center text-sm">
+                  <span className="text-slate-500 font-medium">- Yönetim + Stopaj</span>
+                  <span className="font-medium text-rose-500/80">
+                    -{fmt(asset.realized_gross_profit - asset.realized_net_profit)} <span className="text-xs opacity-60">{asset.currency}</span>
+                  </span>
+                </li>
+              )}
               <li className="flex justify-between items-center text-sm">
-                <span className="text-slate-400 font-medium">Enflasyon Erimesi</span>
-                <span className="font-semibold text-amber-500">-{fmt(asset.realized_inflation_diff)} <span className="text-amber-500/50 font-normal ml-0.5">{asset.currency}</span></span>
+                <span className="text-slate-500 font-medium">- Enflasyon Erimesi</span>
+                <span className="font-medium text-amber-500/80">-{fmt(asset.realized_inflation_diff)} <span className="text-xs opacity-60">{asset.currency}</span></span>
               </li>
-              <div className="h-px bg-slate-800/60 my-5"></div>
+              <div className="h-px bg-slate-800/60 my-3"></div>
               <li className="flex justify-between items-center text-sm">
-                <span className="text-slate-300 font-bold">Gerçekleşen Reel Kâr</span>
-                <span className={`font-black text-xl tracking-tight ${asset.realized_real_net_profit >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
+                <span className="text-slate-300 font-semibold">Gerçekleşen Reel Kâr</span>
+                <span className={`font-bold text-lg ${asset.realized_real_net_profit >= 0 ? "text-white" : "text-rose-400"}`}>
                   {asset.realized_real_net_profit >= 0 ? "+" : ""}{fmt(asset.realized_real_net_profit)} <span className="text-sm font-normal opacity-50">{asset.currency}</span>
                 </span>
               </li>
+              {asset.risk_margin_rate > 0 && (
+                <>
+                  <li className="flex justify-between items-center text-sm">
+                    <span className="text-slate-500 font-medium">- Bağış / Risk Arındırma (%{asset.risk_margin_rate.toFixed(1)})</span>
+                    <span className="font-medium text-slate-500">
+                      -{fmt(asset.realized_real_net_profit - asset.realized_risk_margin_profit)} <span className="text-xs opacity-60">{asset.currency}</span>
+                    </span>
+                  </li>
+                  <li className="flex justify-between items-center text-sm border-t border-slate-800/60 pt-3">
+                    <span className="text-white font-bold">Nihai Net Kâr</span>
+                    <span className={`font-black text-xl tracking-tight ${asset.realized_risk_margin_profit >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                      {asset.realized_risk_margin_profit >= 0 ? '+' : ''}{fmt(asset.realized_risk_margin_profit)} <span className="text-sm font-normal opacity-50">{asset.currency}</span>
+                    </span>
+                  </li>
+                </>
+              )}
             </ul>
           ) : (
             <div className="py-12 text-center italic text-slate-500 text-sm border border-dashed border-slate-800 rounded-xl bg-slate-900/20">Gerçekleşmiş bir satış işlemi bulunmamaktadır.</div>
