@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy import func
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Optional
 from datetime import date
 
 import models, schemas, crud
