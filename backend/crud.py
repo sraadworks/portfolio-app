@@ -17,6 +17,34 @@ def create_asset(db: Session, asset: schemas.AssetCreate):
     db.refresh(db_asset)
     return db_asset
 
+def get_portfolios(db: Session):
+    return db.query(models.Portfolio).all()
+
+def create_portfolio(db: Session, portfolio: schemas.PortfolioCreate):
+    db_portfolio = models.Portfolio(**portfolio.model_dump())
+    db.add(db_portfolio)
+    db.commit()
+    db.refresh(db_portfolio)
+    return db_portfolio
+
+def delete_portfolio(db: Session, portfolio_id: int):
+    db_portfolio = db.query(models.Portfolio).filter(models.Portfolio.id == portfolio_id).first()
+    if db_portfolio:
+        db.query(models.Asset).filter(models.Asset.portfolio_id == portfolio_id).update({"portfolio_id": None})
+        db.delete(db_portfolio)
+        db.commit()
+        return True
+    return False
+
+def update_asset_portfolio(db: Session, asset_id: int, portfolio_id: int = None):
+    db_asset = get_asset(db, asset_id)
+    if db_asset:
+        db_asset.portfolio_id = portfolio_id
+        db.commit()
+        db.refresh(db_asset)
+        return db_asset
+    return None
+
 def get_lots_for_asset(db: Session, asset_id: int):
     return db.query(models.Lot).filter(models.Lot.asset_id == asset_id, models.Lot.remaining_amount > 0).order_by(models.Lot.buy_date.asc()).all()
 

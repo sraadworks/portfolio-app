@@ -357,7 +357,8 @@ def read_assets(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
             total_real_net_profit=total_real_net_profit,
             total_risk_margin_profit=total_risk_margin_profit,
             
-            risk_margin_rate=risk_margin_rate
+            risk_margin_rate=risk_margin_rate,
+            portfolio_name=asset.portfolio.name if asset.portfolio else None
         ))
         
     return performances
@@ -536,3 +537,28 @@ def delete_reference_data(ref_id: int, db: Session = Depends(get_db)):
     db.delete(ref)
     db.commit()
     return {"message": "Deleted", "id": ref_id}
+
+# --- Portfolios ---
+@app.get("/portfolios/", response_model=List[schemas.Portfolio])
+def read_portfolios(db: Session = Depends(get_db)):
+    return crud.get_portfolios(db)
+
+@app.post("/portfolios/", response_model=schemas.Portfolio)
+def create_portfolio(portfolio: schemas.PortfolioCreate, db: Session = Depends(get_db)):
+    return crud.create_portfolio(db=db, portfolio=portfolio)
+
+@app.delete("/portfolios/{portfolio_id}")
+def delete_portfolio(portfolio_id: int, db: Session = Depends(get_db)):
+    res = crud.delete_portfolio(db, portfolio_id)
+    if not res:
+        raise HTTPException(status_code=404, detail="Portfolio not found")
+    return {"message": "Deleted"}
+
+@app.put("/assets/{asset_id}/portfolio")
+def update_asset_portfolio(asset_id: int, portfolio_id: Optional[int] = None, db: Session = Depends(get_db)):
+    # Using Optional[int] = None for clarity, but the JSON body will dictate the value.
+    # Actually, let's use a simple dict for the body to be flexible
+    res = crud.update_asset_portfolio(db, asset_id, portfolio_id)
+    if not res:
+        raise HTTPException(status_code=404, detail="Asset not found")
+    return res

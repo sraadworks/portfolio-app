@@ -9,6 +9,7 @@ class AssetBase(BaseModel):
     currency: str
     sector: Optional[str] = "Diğer"
     manual_price: Optional[float] = None
+    portfolio_id: Optional[int] = None
 
 class AssetCreate(AssetBase):
     pass
@@ -65,6 +66,20 @@ class AssetPerformance(Asset):
     total_risk_margin_profit: float
     
     risk_margin_rate: float
+    portfolio_name: Optional[str] = None
+
+class PortfolioBase(BaseModel):
+    name: str
+    description: Optional[str] = None
+
+class PortfolioCreate(PortfolioBase):
+    pass
+
+class Portfolio(PortfolioBase):
+    id: int
+
+    class Config:
+        from_attributes = True
 
 class TransactionBase(BaseModel):
     transaction_type: str

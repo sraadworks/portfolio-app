@@ -13,9 +13,20 @@ class Asset(Base):
     currency = Column(String) # TRY, USD
     sector = Column(String, default="Diğer") # Teknoloji, Havacılık, Sanayi vb.
     manual_price = Column(Float, nullable=True) # User-defined manual price
+    portfolio_id = Column(Integer, ForeignKey("portfolios.id"), nullable=True)
 
+    portfolio = relationship("Portfolio", back_populates="assets")
     lots = relationship("Lot", back_populates="asset")
     transactions = relationship("Transaction", back_populates="asset")
+
+class Portfolio(Base):
+    __tablename__ = "portfolios"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, unique=True, index=True)
+    description = Column(String, nullable=True)
+
+    assets = relationship("Asset", back_populates="portfolio")
 
 
 class Transaction(Base):
