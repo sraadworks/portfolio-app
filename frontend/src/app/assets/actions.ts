@@ -11,6 +11,8 @@ export async function createAsset(formData: FormData) {
   const sector = formData.get('sector') as string;
   const manual_price_raw = formData.get('manual_price') as string;
   const manual_price = manual_price_raw ? parseFloat(manual_price_raw) : null;
+  const portfolio_id_raw = formData.get('portfolio_id') as string;
+  const portfolio_id = portfolio_id_raw && portfolio_id_raw !== 'none' ? parseInt(portfolio_id_raw) : null;
 
   try {
     const res = await fetch(`${API_URL}/assets/`, {
@@ -25,6 +27,7 @@ export async function createAsset(formData: FormData) {
         currency,
         sector,
         manual_price,
+        portfolio_id,
       }),
     });
 
@@ -129,11 +132,13 @@ export async function updateAsset(assetId: number, formData: FormData) {
   const sector = formData.get('sector') as string;
   const manual_price_raw = formData.get('manual_price') as string;
   const manual_price = manual_price_raw ? parseFloat(manual_price_raw) : null;
+  const portfolio_id_raw = formData.get('portfolio_id') as string;
+  const portfolio_id = portfolio_id_raw && portfolio_id_raw !== 'none' ? parseInt(portfolio_id_raw) : null;
 
   const res = await fetch(`${API_URL}/assets/${assetId}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ symbol, name, asset_type, currency, sector, manual_price }),
+    body: JSON.stringify({ symbol, name, asset_type, currency, sector, manual_price, portfolio_id }),
   });
 
   if (!res.ok) {
@@ -211,6 +216,41 @@ export async function updateTransaction(txId: number, formData: FormData) {
 
   revalidatePath('/assets');
   revalidatePath('/cash-ledger');
+  revalidatePath('/');
+  return { success: true };
+}
+
+export async function createPortfolio(formData: FormData) {
+  const name = formData.get('name') as string;
+  const description = formData.get('description') as string;
+
+  const res = await fetch(`${API_URL}/portfolios/`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, description }),
+  });
+
+  if (!res.ok) {
+    const err = await res.json();
+    return { error: err.detail || 'Portföy oluşturulamadı.' };
+  }
+
+  revalidatePath('/assets');
+  revalidatePath('/');
+  return { success: true };
+}
+
+export async function deletePortfolio(id: number) {
+  const res = await fetch(`${API_URL}/portfolios/${id}`, {
+    method: 'DELETE',
+  });
+
+  if (!res.ok) {
+    const err = await res.json();
+    return { error: err.detail || 'Portföy silinemedi.' };
+  }
+
+  revalidatePath('/assets');
   revalidatePath('/');
   return { success: true };
 }

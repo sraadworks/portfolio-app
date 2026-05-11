@@ -22,17 +22,32 @@ interface Asset {
 
 export default async function AssetsPage() {
   let allAssets: Asset[] = [];
+  let portfolios: any[] = [];
   try {
-    const res = await fetch(`${API_URL}/assets/`, { cache: 'no-store' });
-    if (res.ok) {
-      allAssets = await res.json();
+    const [assetsRes, portfoliosRes] = await Promise.all([
+      fetch(`${API_URL}/assets/`, { cache: 'no-store' }),
+      fetch(`${API_URL}/portfolios/`, { cache: 'no-store' })
+    ]);
+    
+    if (assetsRes.ok) {
+      allAssets = await assetsRes.json();
+    }
+    if (portfoliosRes.ok) {
+      portfolios = await portfoliosRes.json();
     }
   } catch (err) {
-    console.error("Failed to fetch assets:", err);
+    console.error("Failed to fetch assets/portfolios:", err);
   }
 
-  const activeAssets = allAssets.filter((a: Asset) => a.active_quantity > 0);
-  const closedAssets = allAssets.filter((a: Asset) => a.active_quantity <= 0);
+  const activeAssets = allAssets.filter((a: any) => a.active_quantity > 0);
+  const closedAssets = allAssets.filter((a: any) => a.active_quantity <= 0);
+
+  const groupedAssets = activeAssets.reduce((acc: any, asset: any) => {
+    const portfolio = asset.portfolio_name || 'Genel Portföy';
+    if (!acc[portfolio]) acc[portfolio] = [];
+    acc[portfolio].push(asset);
+    return acc;
+  }, {});
 
   return (
     <div className="flex flex-col h-full max-w-7xl w-full">
@@ -44,7 +59,7 @@ export default async function AssetsPage() {
         </div>
         <div className="flex gap-3">
           <AddTransactionForm assets={allAssets} />
-          <AddAssetForm />
+          <AddAssetForm portfolios={portfolios} />
         </div>
       </div>
 
@@ -85,71 +100,73 @@ export default async function AssetsPage() {
               </tr>
             </thead>
             <tbody>
-              {/* GROUP: ACTIVE */}
-              <tr className="bg-slate-900/40 border-b border-slate-800">
-                <td colSpan={10} className="px-6 py-2.5 text-xs font-semibold text-slate-300">
-                  Aktif Varlıklar <span className="ml-2 px-1.5 py-0.5 rounded-full bg-slate-800 text-slate-400">{activeAssets.length}</span>
-                </td>
-              </tr>
-              
               {activeAssets.length === 0 ? (
                 <tr>
                   <td colSpan={10} className="px-6 py-8 text-center text-slate-500 italic">Henüz aktif bir varlığınız bulunmuyor.</td>
                 </tr>
               ) : (
-                activeAssets.map((asset: Asset) => {
-                  const avgCost = asset.active_quantity > 0 ? asset.active_cost / asset.active_quantity : 0;
-                  const isUSDProfit = asset.active_usd_profit >= 0;
-                  const currentPrice = asset.active_quantity > 0 ? asset.active_value / asset.active_quantity : 0;
-                  
-                  return (
-                    <tr key={asset.id} className="border-b border-slate-800 hover:bg-slate-800/30 transition-colors">
-                      <td className="px-6 py-4">
-                        <div className="font-semibold text-white">{asset.symbol}</div>
-                        <div className="text-xs text-slate-500">{asset.name}</div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <span className="inline-flex items-center gap-1.5 py-1 px-2.5 rounded-full text-[10px] font-semibold tracking-wide bg-slate-800/50 text-slate-300 border border-slate-700/50 uppercase">
-                          <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
-                          {asset.asset_type}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-right font-medium text-white">{asset.active_quantity}</td>
-                      <td className="px-6 py-4 text-right text-slate-300">
-                        {avgCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-slate-500 text-xs">{asset.currency}</span>
-                      </td>
-                      <td className="px-6 py-4 text-right text-white font-medium">
-                        {currentPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-slate-500 text-xs">{asset.currency}</span>
-                      </td>
-                      <td className="px-6 py-4 text-right">
-                        <div className="font-semibold text-white">${asset.active_usd_value?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-                        <div className="text-[10px] text-slate-500 mt-0.5">Maliyet: ${asset.active_usd_cost?.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</div>
-                      </td>
-                      <td className="px-6 py-4 text-right">
-                        <div className={`font-semibold ${isUSDProfit ? 'text-emerald-400' : 'text-rose-400'}`}>
-                          {isUSDProfit ? '+' : ''}${asset.active_usd_profit?.toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                        </div>
-                        <div className={`text-[10px] mt-0.5 font-medium ${isUSDProfit ? 'text-emerald-500/70' : 'text-rose-500/70'}`}>
-                          {isUSDProfit ? '▲' : '▼'} %{asset.active_usd_percent?.toFixed(2)}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 text-right">
-                        <div className={`font-semibold ${asset.active_real_net_profit >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
-                          {asset.active_real_net_profit >= 0 ? '+' : ''}₺{asset.active_real_net_profit.toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 text-center">
-                        <Link href={`/assets/${asset.id}/analysis`} className="inline-flex items-center gap-1.5 py-1 px-3 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 transition-colors">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                          Açık
-                        </Link>
-                      </td>
-                      <td className="px-6 py-4 text-center">
-                        <AssetActions asset={asset} />
+                Object.entries(groupedAssets).map(([portfolioName, assets]: [string, any]) => (
+                  <>
+                    <tr className="bg-slate-900/20 border-b border-slate-800/50">
+                      <td colSpan={10} className="px-6 py-2 text-[10px] font-bold text-blue-400 uppercase tracking-widest">
+                        {portfolioName}
                       </td>
                     </tr>
-                  );
-                })
+                    {assets.map((asset: any) => {
+                      const avgCost = asset.active_quantity > 0 ? asset.active_cost / asset.active_quantity : 0;
+                      const isUSDProfit = asset.active_usd_profit >= 0;
+                      const currentPrice = asset.active_quantity > 0 ? asset.active_value / asset.active_quantity : 0;
+                      
+                      return (
+                        <tr key={asset.id} className="border-b border-slate-800 hover:bg-slate-800/30 transition-colors">
+                          <td className="px-6 py-4">
+                            <div className="font-semibold text-white">{asset.symbol}</div>
+                            <div className="text-xs text-slate-500">{asset.name}</div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className="inline-flex items-center gap-1.5 py-1 px-2.5 rounded-full text-[10px] font-semibold tracking-wide bg-slate-800/50 text-slate-300 border border-slate-700/50 uppercase">
+                              <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                              {asset.asset_type}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 text-right font-medium text-white">{asset.active_quantity}</td>
+                          <td className="px-6 py-4 text-right text-slate-300">
+                            {avgCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-slate-500 text-xs">{asset.currency}</span>
+                          </td>
+                          <td className="px-6 py-4 text-right text-white font-medium">
+                            {currentPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-slate-500 text-xs">{asset.currency}</span>
+                          </td>
+                          <td className="px-6 py-4 text-right">
+                            <div className="font-semibold text-white">${asset.active_usd_value?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                            <div className="text-[10px] text-slate-500 mt-0.5">Maliyet: ${asset.active_usd_cost?.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</div>
+                          </td>
+                          <td className="px-6 py-4 text-right">
+                            <div className={`font-semibold ${isUSDProfit ? 'text-emerald-400' : 'text-rose-400'}`}>
+                              {isUSDProfit ? '+' : ''}${asset.active_usd_profit?.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                            </div>
+                            <div className={`text-[10px] mt-0.5 font-medium ${isUSDProfit ? 'text-emerald-500/70' : 'text-rose-500/70'}`}>
+                              {isUSDProfit ? '▲' : '▼'} %{asset.active_usd_percent?.toFixed(2)}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 text-right">
+                            <div className={`font-semibold ${asset.active_real_net_profit >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                              {asset.active_real_net_profit >= 0 ? '+' : ''}₺{asset.active_real_net_profit.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 text-center">
+                            <Link href={`/assets/${asset.id}/analysis`} className="inline-flex items-center gap-1.5 py-1 px-3 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 transition-colors">
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                              Açık
+                            </Link>
+                          </td>
+                          <td className="px-6 py-4 text-center">
+                            <AssetActions asset={asset} />
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </>
+                ))
               )}
 
               {/* GROUP: CLOSED */}
