@@ -15,6 +15,8 @@ interface Asset {
   active_value: number;
   active_holding_days: number;
   active_gross_profit: number;
+  active_commission: number;
+  active_tax: number;
   active_net_profit: number;
   active_inflation_diff: number;
   active_real_net_profit: number;
@@ -33,6 +35,8 @@ interface Asset {
   realized_cost: number;
   realized_holding_days: number;
   realized_gross_profit: number;
+  realized_commission: number;
+  realized_tax: number;
   realized_net_profit: number;
   realized_inflation_diff: number;
   realized_real_net_profit: number;
@@ -233,11 +237,19 @@ export default function AssetAnalysisPage({ params }: { params: Promise<{ id: st
                   {asset.active_gross_profit >= 0 ? "+" : ""}{fmt(asset.active_gross_profit)} <span className="text-sm font-normal opacity-50">{asset.currency}</span>
                 </span>
               </li>
-              {asset.active_net_profit !== asset.active_gross_profit && (
+              {asset.active_commission > 0 && (
                 <li className="flex justify-between items-center text-sm">
-                  <span className="text-slate-500 font-medium">- Yönetim + Stopaj</span>
+                  <span className="text-slate-500 font-medium">- Yönetim Ücreti</span>
                   <span className="font-medium text-rose-500/80">
-                    -{fmt(asset.active_gross_profit - asset.active_net_profit)} <span className="text-xs opacity-60">{asset.currency}</span>
+                    -{fmt(asset.active_commission)} <span className="text-xs opacity-60">{asset.currency}</span>
+                  </span>
+                </li>
+              )}
+              {asset.active_tax > 0 && (
+                <li className="flex justify-between items-center text-sm">
+                  <span className="text-slate-500 font-medium">- Stopaj</span>
+                  <span className="font-medium text-rose-500/80">
+                    -{fmt(asset.active_tax)} <span className="text-xs opacity-60">{asset.currency}</span>
                   </span>
                 </li>
               )}
@@ -311,11 +323,19 @@ export default function AssetAnalysisPage({ params }: { params: Promise<{ id: st
                   {asset.realized_gross_profit >= 0 ? "+" : ""}{fmt(asset.realized_gross_profit)} <span className="opacity-50 font-normal ml-0.5">{asset.currency}</span>
                 </span>
               </li>
-              {asset.realized_net_profit !== asset.realized_gross_profit && (
+              {asset.realized_commission > 0 && (
                 <li className="flex justify-between items-center text-sm">
-                  <span className="text-slate-500 font-medium">- Yönetim + Stopaj</span>
+                  <span className="text-slate-500 font-medium">- Yönetim Ücreti</span>
                   <span className="font-medium text-rose-500/80">
-                    -{fmt(asset.realized_gross_profit - asset.realized_net_profit)} <span className="text-xs opacity-60">{asset.currency}</span>
+                    -{fmt(asset.realized_commission)} <span className="text-xs opacity-60">{asset.currency}</span>
+                  </span>
+                </li>
+              )}
+              {asset.realized_tax > 0 && (
+                <li className="flex justify-between items-center text-sm">
+                  <span className="text-slate-500 font-medium">- Stopaj</span>
+                  <span className="font-medium text-rose-500/80">
+                    -{fmt(asset.realized_tax)} <span className="text-xs opacity-60">{asset.currency}</span>
                   </span>
                 </li>
               )}

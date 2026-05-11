@@ -26,6 +26,8 @@ class AssetPerformance(Asset):
     active_value: float
     active_cost: float
     active_gross_profit: float
+    active_commission: float = 0.0
+    active_tax: float = 0.0
     active_net_profit: float
     active_inflation_diff: float
     active_real_net_profit: float
@@ -43,6 +45,8 @@ class AssetPerformance(Asset):
     realized_cost: float
     realized_revenue: float
     realized_gross_profit: float
+    realized_commission: float = 0.0
+    realized_tax: float = 0.0
     realized_net_profit: float
     realized_inflation_diff: float
     realized_real_net_profit: float
