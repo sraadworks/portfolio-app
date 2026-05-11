@@ -87,8 +87,8 @@ export default function AddAssetForm({ portfolios }: { portfolios: any[] }) {
                 <div>
                   <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Para Birimi</label>
                   <select name="currency" className="w-full bg-[#0B0F19] border border-slate-800 rounded-md px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all">
-                    <option value="TRY">TRY</option>
-                    <option value="USD">USD</option>
+                    <option value="TRY" translate="no">TRY</option>
+                    <option value="USD" translate="no">USD</option>
                   </select>
                 </div>
               </div>

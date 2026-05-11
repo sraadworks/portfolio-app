@@ -157,8 +157,8 @@ export default function AssetActions({ asset, portfolios }: { asset: any, portfo
                     <div>
                       <label className="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Para Birimi</label>
                       <select name="currency" defaultValue={asset.currency} className="w-full bg-[#0B0F19] border border-slate-800 rounded-md px-3 py-1.5 text-sm text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all">
-                        <option value="TRY">TRY</option>
-                        <option value="USD">USD</option>
+                        <option value="TRY" translate="no">TRY</option>
+                        <option value="USD" translate="no">USD</option>
                       </select>
                     </div>
                     <div>
