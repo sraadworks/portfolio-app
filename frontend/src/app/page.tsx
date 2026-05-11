@@ -1,6 +1,3 @@
-'use client';
-
-import { useEffect, useState } from 'react';
 import { API_URL } from './apiConfig';
 
 interface Asset {
@@ -18,39 +15,31 @@ interface Asset {
   active_usd_value: number;
 }
 
-export default function Home() {
-  const [data, setData] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+export default async function Home() {
+  let data: any = null;
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const [assetsRes, cashRes, perfRes] = await Promise.all([
-          fetch(`${API_URL}/assets/`),
-          fetch(`${API_URL}/cash-ledger/summary`),
-          fetch(`${API_URL}/portfolio/performance`)
-        ]);
+  try {
+    const [assetsRes, cashRes, perfRes] = await Promise.all([
+      fetch(`${API_URL}/assets/`, { cache: 'no-store' }),
+      fetch(`${API_URL}/cash-ledger/summary`, { cache: 'no-store' }),
+      fetch(`${API_URL}/portfolio/performance`, { cache: 'no-store' })
+    ]);
 
-        const assets = await assetsRes.json();
-        const cashSummary = await cashRes.json();
-        const performancePayload = await perfRes.json();
-
-        setData({ assets, cashSummary, performancePayload });
-      } catch (err) {
-        console.error("Fetch error:", err);
-      } finally {
-        setLoading(false);
-      }
+    if (assetsRes.ok && cashRes.ok && perfRes.ok) {
+      const assets = await assetsRes.json();
+      const cashSummary = await cashRes.json();
+      const performancePayload = await perfRes.json();
+      data = { assets, cashSummary, performancePayload };
     }
-    fetchData();
-  }, []);
+  } catch (err) {
+    console.error("Fetch error:", err);
+  }
 
-  if (loading) return <div className="p-10 text-center font-bold">Portföy Yükleniyor...</div>;
-  if (!data) return <div className="p-10 text-center text-rose-500">Veri alınamadı.</div>;
+  if (!data) return <div className="p-10 text-center text-rose-500">Veri alınamadı veya sunucuya bağlanılamadı.</div>;
 
   const { assets, cashSummary, performancePayload } = data;
-  const totalCashTRY = cashSummary.TRY;
-  const totalCashUSD = cashSummary.USD;
+  const totalCashTRY = cashSummary?.TRY || 0;
+  const totalCashUSD = cashSummary?.USD || 0;
 
   const tryAssets = assets.filter((a: Asset) => a.currency === 'TRY');
   const usdAssets = assets.filter((a: Asset) => a.currency === 'USD');
@@ -76,16 +65,8 @@ export default function Home() {
   const totalUSDProfit = totalUSDValue - totalUSDCost;
   const usdPercent = totalUSDCost > 0 ? (totalUSDProfit / totalUSDCost) * 100 : 0;
 
-  // Prepare Distribution Data
-  const assetDistribution = assets.map((a: Asset) => ({
-    name: a.symbol,
-    value: a.currency === 'TRY' ? a.active_value : a.active_value * 32.5,
-  }));
-  if (totalCashTRY > 0) assetDistribution.push({ name: 'Nakit (TL)', value: totalCashTRY });
-  if (totalCashUSD > 0) assetDistribution.push({ name: 'Nakit (USD)', value: totalCashUSD * 32.5 });
-
   return (
-    <div className="flex flex-col h-full max-w-6xl">
+    <div className="flex flex-col h-full max-w-6xl w-full">
       {/* Header Area */}
       <div className="flex justify-between items-end mb-8">
         <div>

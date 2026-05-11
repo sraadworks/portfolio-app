@@ -1,11 +1,8 @@
-'use client';
-
 import { API_URL } from "../apiConfig";
 import AddAssetForm from './AddAssetForm';
 import AddTransactionForm from './AddTransactionForm';
 import Link from 'next/link';
 import AssetActions from './AssetActions';
-import { useEffect, useState } from 'react';
 
 interface Asset {
   id: number;
@@ -23,26 +20,16 @@ interface Asset {
   active_real_net_profit: number;
 }
 
-export default function AssetsPage() {
-  const [allAssets, setAllAssets] = useState<Asset[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchAssets() {
-      try {
-        const res = await fetch(`${API_URL}/assets/`);
-        const assets = await res.json();
-        setAllAssets(assets);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
+export default async function AssetsPage() {
+  let allAssets: Asset[] = [];
+  try {
+    const res = await fetch(`${API_URL}/assets/`, { cache: 'no-store' });
+    if (res.ok) {
+      allAssets = await res.json();
     }
-    fetchAssets();
-  }, []);
-
-  if (loading) return <div className="p-10 text-center font-bold">Varlıklar Yükleniyor...</div>;
+  } catch (err) {
+    console.error("Failed to fetch assets:", err);
+  }
 
   const activeAssets = allAssets.filter((a: Asset) => a.active_quantity > 0);
   const closedAssets = allAssets.filter((a: Asset) => a.active_quantity <= 0);
