@@ -20,16 +20,23 @@ try:
     logger.info("Database tables created successfully.")
     
     # Manual migration for existing databases
-    with engine.begin() as conn:
-        # Check assets table for portfolio_id
+    with engine.connect() as conn:
         try:
-            conn.execute(text("SELECT portfolio_id FROM assets LIMIT 1"))
-        except Exception:
-            logger.info("Migration: Adding portfolio_id column to assets table...")
-            try:
-                conn.execute(text("ALTER TABLE assets ADD COLUMN portfolio_id INTEGER"))
-            except Exception as e:
-                logger.error(f"Manual migration failed: {e}")
+            if engine.name == 'sqlite':
+                res = conn.execute(text("PRAGMA table_info(assets)"))
+                columns = [row[1] for row in res.fetchall()]
+                if 'portfolio_id' not in columns:
+                    logger.info("Migration: Adding portfolio_id to assets (SQLite)")
+                    conn.execute(text("ALTER TABLE assets ADD COLUMN portfolio_id INTEGER"))
+            else:
+                # Postgres or other
+                try:
+                    conn.execute(text("ALTER TABLE assets ADD COLUMN portfolio_id INTEGER"))
+                except Exception:
+                    pass
+            conn.commit()
+        except Exception as e:
+            logger.error(f"Migration error: {e}")
 except Exception as e:
     logger.error(f"Error during database initialization: {e}")
     # Don't exit yet, let's see if FastAPI can at least start
@@ -45,6 +52,13 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.post("/debug/reset-db")
+def reset_db(db: Session = Depends(get_db)):
+    # CAUTION: This deletes everything!
+    models.Base.metadata.drop_all(bind=engine)
+    models.Base.metadata.create_all(bind=engine)
+    return {"message": "Database reset successfully"}
 
 @app.get("/")
 def read_root():
