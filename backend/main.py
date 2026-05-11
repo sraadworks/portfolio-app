@@ -206,8 +206,16 @@ def read_assets(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
         realized_inflation_diff = sum(tx.realized_inflation_diff for tx in sell_txs)
         realized_gross_profit = realized_revenue - realized_cost
 
-        realized_commission = sum(max(0.0, tx.realized_profit) * (tx.commission / 100.0) for tx in sell_txs)
-        realized_tax = sum(max(0.0, tx.realized_profit - (max(0.0, tx.realized_profit) * (tx.commission / 100.0))) * (tx.tax / 100.0) for tx in sell_txs)
+        # Realized commission/tax: use SELL tx's own rate if set, else fall back to BUY weighted avg
+        realized_commission = sum(
+            max(0.0, tx.realized_profit) * ((tx.commission if tx.commission > 0 else mgmt_fee_rate) / 100.0)
+            for tx in sell_txs
+        )
+        realized_tax = sum(
+            max(0.0, tx.realized_profit - max(0.0, tx.realized_profit) * ((tx.commission if tx.commission > 0 else mgmt_fee_rate) / 100.0)) *
+            ((tx.tax if tx.tax > 0 else tax_rate) / 100.0)
+            for tx in sell_txs
+        )
         
         realized_net_profit = realized_gross_profit - realized_commission - realized_tax
         realized_real_net_profit = realized_net_profit - realized_inflation_diff
