@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { deleteAsset, updateAsset, getAssetTransactions, updateTransaction, deleteTransaction } from './actions';
 
-export default function AssetActions({ asset }: { asset: any }) {
+export default function AssetActions({ asset, portfolios }: { asset: any, portfolios: any[] }) {
   const [showConfirm, setShowConfirm] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -159,6 +159,15 @@ export default function AssetActions({ asset }: { asset: any }) {
                       <select name="currency" defaultValue={asset.currency} className="w-full bg-[#0B0F19] border border-slate-800 rounded-md px-3 py-1.5 text-sm text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all">
                         <option value="TRY">TRY</option>
                         <option value="USD">USD</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Portföy Grubu</label>
+                      <select name="portfolio_id" defaultValue={asset.portfolio_id || 'none'} className="w-full bg-[#0B0F19] border border-slate-800 rounded-md px-3 py-1.5 text-sm text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all">
+                        <option value="none">Genel Portföy</option>
+                        {portfolios.map(p => (
+                          <option key={p.id} value={p.id}>{p.name}</option>
+                        ))}
                       </select>
                     </div>
                     <div>

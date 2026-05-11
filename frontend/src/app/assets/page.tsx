@@ -160,7 +160,7 @@ export default async function AssetsPage() {
                             </Link>
                           </td>
                           <td className="px-6 py-4 text-center">
-                            <AssetActions asset={asset} />
+                            <AssetActions asset={asset} portfolios={portfolios} />
                           </td>
                         </tr>
                       );
@@ -228,7 +228,7 @@ export default async function AssetsPage() {
                         </Link>
                       </td>
                       <td className="px-6 py-4 text-center opacity-50">
-                        <AssetActions asset={asset} />
+                        <AssetActions asset={asset} portfolios={portfolios} />
                       </td>
                     </tr>
                   );
