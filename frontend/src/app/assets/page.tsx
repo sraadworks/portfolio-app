@@ -99,7 +99,7 @@ export default function AssetsPage() {
             <div className="overflow-x-auto custom-scrollbar">
               <table className="w-full whitespace-nowrap">
                 <thead>
-                  <tr className="border-b border-[var(--border-main)] text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest bg-slate-500/5">
+                  <tr className="border-b border-[var(--border-main)] text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest bg-slate-500/5">
                     <th className="px-6 py-5 font-bold text-left">Sembol</th>
                     <th className="px-6 py-5 font-bold text-left">Tip</th>
                     <th className="px-6 py-5 font-bold text-right">Adet</th>
@@ -122,40 +122,40 @@ export default function AssetsPage() {
                     return (
                       <tr key={asset.id} className="hover:bg-[var(--bg-hover)]/30 transition-colors group">
                         <td className="px-6 py-5">
-                          <div className="font-black text-[var(--text-primary)] group-hover:text-blue-600 transition-colors text-base">{asset.symbol}</div>
-                          <div className="text-[10px] text-slate-500 font-medium">{asset.name}</div>
+                          <div className="font-black text-[var(--text-primary)] group-hover:text-blue-600 transition-colors text-[18px]">{asset.symbol}</div>
+                          <div className="text-[11px] text-slate-500 font-medium">{asset.name}</div>
                         </td>
                         <td className="px-6 py-5">
-                          <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-[9px] font-black tracking-widest bg-slate-500/10 text-slate-500 dark:text-slate-400 border border-slate-500/10 uppercase">
+                          <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] font-black tracking-widest bg-slate-500/10 text-slate-500 dark:text-slate-400 border border-slate-500/10 uppercase">
                             {asset.asset_type}
                           </span>
                         </td>
-                        <td className="px-6 py-5 text-right font-black text-[var(--text-primary)]">{asset.active_quantity}</td>
-                        <td className="px-6 py-5 text-right text-slate-500 font-medium">
-                          {avgCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-[10px] opacity-60">{asset.currency}</span>
+                        <td className="px-6 py-5 text-right font-black text-[var(--text-primary)] text-[15.5px]">{asset.active_quantity}</td>
+                        <td className="px-6 py-5 text-right text-slate-500 font-bold text-[14px]">
+                          {avgCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-[11px] opacity-60">{asset.currency}</span>
                         </td>
-                        <td className="px-6 py-5 text-right text-[var(--text-primary)] font-black">
-                          {currentPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-slate-400 text-[10px]">{asset.currency}</span>
-                        </td>
-                        <td className="px-6 py-5 text-right">
-                          <div className="font-black text-[var(--text-primary)] text-base">${asset.active_usd_value?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-                          <div className="text-[9px] text-slate-500 mt-1 font-bold">Maliyet: ${asset.active_usd_cost?.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</div>
+                        <td className="px-6 py-5 text-right text-[var(--text-primary)] font-black text-[15.5px]">
+                          {currentPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-slate-400 text-[11px]">{asset.currency}</span>
                         </td>
                         <td className="px-6 py-5 text-right">
-                          <div className={`font-black text-base ${isUSDProfit ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
+                          <div className="font-black text-[var(--text-primary)] text-[18px]">${asset.active_usd_value?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                          <div className="text-[10px] text-slate-500 mt-1 font-bold tracking-tight">Maliyet: ${asset.active_usd_cost?.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</div>
+                        </td>
+                        <td className="px-6 py-5 text-right">
+                          <div className={`font-black text-[18px] ${isUSDProfit ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
                             {isUSDProfit ? '+' : ''}${asset.active_usd_profit?.toLocaleString(undefined, { maximumFractionDigits: 0 })}
                           </div>
-                          <div className={`text-[10px] mt-1 font-black ${isUSDProfit ? 'text-emerald-500/80' : 'text-rose-500/80'}`}>
+                          <div className={`text-[11px] mt-1 font-black ${isUSDProfit ? 'text-emerald-500/80' : 'text-rose-500/80'}`}>
                             {isUSDProfit ? '▲' : '▼'} %{asset.active_usd_percent?.toFixed(2)}
                           </div>
                         </td>
                         <td className="px-6 py-5 text-right">
-                          <div className={`font-black text-base ${isRealProfit ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
+                          <div className={`font-black text-[18px] ${isRealProfit ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
                             {isRealProfit ? '+' : ''}₺{asset.active_real_net_profit?.toLocaleString(undefined, { maximumFractionDigits: 0 })}
                           </div>
                         </td>
                         <td className="px-6 py-5 text-center">
-                          <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-black bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 uppercase tracking-widest">
+                          <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-black bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 uppercase tracking-widest">
                             Açık
                           </span>
                         </td>
@@ -181,7 +181,7 @@ export default function AssetsPage() {
         <div className="overflow-x-auto custom-scrollbar">
           <table className="w-full whitespace-nowrap">
             <thead>
-              <tr className="border-b border-[var(--border-main)] text-[10px] font-black text-slate-400 uppercase tracking-widest bg-slate-500/5">
+              <tr className="border-b border-[var(--border-main)] text-[11px] font-black text-slate-400 uppercase tracking-widest bg-slate-500/5">
                 <th className="px-6 py-5 font-bold text-left">Sembol</th>
                 <th className="px-6 py-5 font-bold text-left">Tip</th>
                 <th className="px-6 py-5 font-bold text-right">Maliyet</th>
@@ -206,35 +206,35 @@ export default function AssetsPage() {
                   return (
                     <tr key={asset.id} className="hover:bg-[var(--bg-hover)]/30 transition-colors">
                       <td className="px-6 py-5">
-                        <div className="font-black text-slate-400 dark:text-slate-500 text-base">{asset.symbol}</div>
-                        <div className="text-[10px] text-slate-500">{asset.name}</div>
+                        <div className="font-black text-slate-400 dark:text-slate-500 text-[18px]">{asset.symbol}</div>
+                        <div className="text-[11px] text-slate-500">{asset.name}</div>
                       </td>
                       <td className="px-6 py-5">
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[9px] font-black tracking-widest bg-slate-500/10 text-slate-400 border border-slate-500/10 uppercase">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[10px] font-black tracking-widest bg-slate-500/10 text-slate-400 border border-slate-500/10 uppercase">
                           {asset.asset_type}
                         </span>
                       </td>
-                      <td className="px-6 py-5 text-right text-slate-500 font-bold">
-                        {asset.total_cost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-[9px] opacity-60">{asset.currency}</span>
+                      <td className="px-6 py-5 text-right text-slate-500 font-bold text-[14px]">
+                        {asset.total_cost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-[10px] opacity-60">{asset.currency}</span>
                       </td>
-                      <td className="px-6 py-5 text-right text-slate-500 font-black">
-                        {(asset.total_cost + asset.total_gross_profit).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-[9px] opacity-60">{asset.currency}</span>
+                      <td className="px-6 py-5 text-right text-slate-500 font-black text-[15.5px]">
+                        {(asset.total_cost + asset.total_gross_profit).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-[10px] opacity-60">{asset.currency}</span>
                       </td>
                       <td className="px-6 py-5 text-right">
-                        <div className={`font-black text-base ${isProfit ? 'text-emerald-500/70' : 'text-rose-500/70'}`}>
-                          {isProfit ? '+' : ''}{asset.total_gross_profit.toLocaleString(undefined, { maximumFractionDigits: 0 })} <span className="text-[9px] opacity-60">{asset.currency}</span>
+                        <div className={`font-black text-[18px] ${isProfit ? 'text-emerald-500/70' : 'text-rose-500/70'}`}>
+                          {isProfit ? '+' : ''}{asset.total_gross_profit.toLocaleString(undefined, { maximumFractionDigits: 0 })} <span className="text-[11px] opacity-60">{asset.currency}</span>
                         </div>
-                        <div className={`text-[10px] mt-1 font-black ${isProfit ? 'text-emerald-600/50' : 'text-rose-600/50'}`}>
+                        <div className={`text-[11px] mt-1 font-black ${isProfit ? 'text-emerald-600/50' : 'text-rose-600/50'}`}>
                           {isProfit ? '▲' : '▼'} %{percent.toFixed(2)}
                         </div>
                       </td>
                       <td className="px-6 py-5 text-right">
-                        <div className={`font-black text-base ${isRealProfit ? 'text-emerald-500/70' : 'text-rose-500/70'}`}>
+                        <div className={`font-black text-[18px] ${isRealProfit ? 'text-emerald-500/70' : 'text-rose-500/70'}`}>
                           {isRealProfit ? '+' : ''}₺{asset.total_real_net_profit.toLocaleString(undefined, { maximumFractionDigits: 0 })}
                         </div>
                       </td>
                       <td className="px-6 py-5 text-center">
-                        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-black bg-slate-500/10 text-slate-400 border border-slate-500/20 uppercase tracking-widest">
+                        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-black bg-slate-500/10 text-slate-400 border border-slate-500/20 uppercase tracking-widest">
                           Kapalı
                         </span>
                       </td>

@@ -77,7 +77,7 @@ export default async function CashLedgerPage(props: { searchParams: Promise<any>
         <div className="overflow-x-auto custom-scrollbar">
           <table className="w-full whitespace-nowrap">
             <thead>
-              <tr className="border-b border-[var(--border-main)] text-[10px] font-black text-slate-400 uppercase tracking-widest bg-slate-500/5">
+              <tr className="border-b border-[var(--border-main)] text-[11px] font-black text-slate-400 uppercase tracking-widest bg-slate-500/5">
                 <th className="px-6 py-5 font-bold text-left">Tarih</th>
                 <th className="px-6 py-5 font-bold text-left">İşlem Tipi</th>
                 <th className="px-6 py-5 font-bold text-left">Açıklama</th>
@@ -103,11 +103,11 @@ export default async function CashLedgerPage(props: { searchParams: Promise<any>
 
                   return (
                     <tr key={item.id} className="hover:bg-[var(--bg-hover)]/30 transition-colors group">
-                      <td className="px-6 py-5 text-slate-500 font-bold">
+                      <td className="px-6 py-5 text-slate-500 font-bold text-[14px]">
                         {item.date}
                       </td>
                       <td className="px-6 py-5">
-                        <span className={`inline-flex items-center gap-2 py-1 px-3 rounded-lg text-[10px] font-black tracking-widest border uppercase ${badgeStyles}`}>
+                        <span className={`inline-flex items-center gap-2 py-1 px-3 rounded-lg text-[11px] font-black tracking-widest border uppercase ${badgeStyles}`}>
                           <span className={`w-1.5 h-1.5 rounded-full ${dotBg}`}></span>
                           {item.transaction_type}
                         </span>
@@ -116,7 +116,7 @@ export default async function CashLedgerPage(props: { searchParams: Promise<any>
                         {item.description}
                       </td>
                       <td className="px-6 py-5 text-right">
-                        <div className={`text-base font-black ${item.amount >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                        <div className={`text-[18px] font-black ${item.amount >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
                           {item.amount > 0 ? '+' : ''}{item.amount.toLocaleString(item.currency === 'TRY' ? 'tr-TR' : 'en-US', { style: 'currency', currency: item.currency })}
                         </div>
                       </td>
